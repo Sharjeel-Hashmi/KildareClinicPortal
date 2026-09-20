@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+/* ── Kildare Clinic design tokens ─────────────────────────────
+   Brand: gold stethoscope mark (#D49011) + black wordmark.
+   Gold is used for fills/accents; text on gold is always ink.
+   For gold TEXT on white use gold-700 (contrast ≥ 5.5:1).       */
+@theme {
+  --font-sans: "Figtree Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Outfit Variable", "Figtree Variable", ui-sans-serif, system-ui, sans-serif;
+
+  --color-ink: #121212;
+  --color-ink-2: #1e1e1c;
+  --color-ink-3: #2c2c29;
+
+  --color-gold-50: #fcf6e8;
+  --color-gold-100: #f7e7c2;
+  --color-gold-200: #efd08a;
+  --color-gold-400: #e2ab3c;
+  --color-gold-500: #d49011;
+  --color-gold-600: #b9780c;
+  --color-gold-700: #8f5b08;
+
+  --color-paper: #f6f5f1;
+  --color-line: #e5e3db;
+  --color-line-strong: #cdcac0;
+  --color-muted: #66645c;
+
+  --color-danger: #b42318;
+  --color-danger-50: #fef3f2;
+  --color-danger-700: #912018;
+  --color-ok: #1b7a4b;
+  --color-ok-50: #ecf8f1;
+  --color-info: #1d5fa6;
+  --color-info-50: #eef5fc;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.012em;
+  }
+  button:not(:disabled),
+  [role="button"],
+  summary {
+    cursor: pointer;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-gold-600);
+    outline-offset: 2px;
+  }
+  input[type="date"],
+  input[type="datetime-local"] {
+    min-height: 2.75rem;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@page {
+  size: A4;
+  margin: 14mm;
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+}
