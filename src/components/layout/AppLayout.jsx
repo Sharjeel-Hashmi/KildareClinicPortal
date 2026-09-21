@@ -26,7 +26,7 @@ function SidebarContent({ onNavigate }) {
       <div className="flex items-center gap-3 px-5 pb-5 pt-6">
         <LogoMark className="h-10 w-auto" />
         <div className="min-w-0">
-          <Wordmark className="h-6 w-auto text-white" />
+          <Wordmark className="h-4 w-auto max-w-full text-white" />
           <p className="mt-1.5 text-[13px] text-[#a9a79d]">Doctor portal</p>
         </div>
       </div>
