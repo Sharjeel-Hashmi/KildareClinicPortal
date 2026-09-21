@@ -1,11 +1,13 @@
+const pad = (n) => String(n).padStart(2, '0');
+
+// All dates in the portal are shown as DD/MM/YYYY (built by hand, so the result never
+// depends on the browser's or computer's language settings).
 // Date-only values (date of birth, registration date) are stored as UTC midnight,
-// so they must be formatted in UTC or they can show as the previous day.
-const dateOnly = new Intl.DateTimeFormat('en-IE', {
-  day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC',
-});
-const dateTime = new Intl.DateTimeFormat('en-IE', {
-  day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false,
-});
+// so they must be read in UTC or they can show as the previous day.
+const dmyUTC = (d) => `${pad(d.getUTCDate())}/${pad(d.getUTCMonth() + 1)}/${d.getUTCFullYear()}`;
+const dmyLocal = (d) => `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+const hmLocal = (d) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
 const timeOnly = new Intl.DateTimeFormat('en-IE', { hour: '2-digit', minute: '2-digit', hour12: false });
 const longDate = new Intl.DateTimeFormat('en-IE', {
   weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
@@ -13,8 +15,12 @@ const longDate = new Intl.DateTimeFormat('en-IE', {
 
 const valid = (v) => v && !Number.isNaN(new Date(v).getTime());
 
-export const formatDate = (v) => (valid(v) ? dateOnly.format(new Date(v)) : '—');
-export const formatDateTime = (v) => (valid(v) ? dateTime.format(new Date(v)).replace(',', '') : '—');
+export const formatDate = (v) => (valid(v) ? dmyUTC(new Date(v)) : '—');
+export const formatDateTime = (v) => {
+  if (!valid(v)) return '—';
+  const d = new Date(v);
+  return `${dmyLocal(d)} ${hmLocal(d)}`;
+};
 export const formatTime = (v) => (valid(v) ? timeOnly.format(new Date(v)) : '—');
 export const formatLongDate = (v = new Date()) => longDate.format(new Date(v));
 
@@ -59,8 +65,6 @@ export const greeting = () => {
 };
 
 /* ── <input> value helpers ─────────────────────────────────── */
-const pad = (n) => String(n).padStart(2, '0');
-
 // 'YYYY-MM-DD' in the browser's local time (for <input type="date">)
 export const todayInput = () => {
   const d = new Date();
