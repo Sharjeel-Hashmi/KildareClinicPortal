@@ -148,14 +148,13 @@ export default function Login() {
             </p>
           </div>
         </div>
-          
-          <p className="...pehle wali classes...">
-            Design by{" "}
-           <a href="https://www.webpalm.ie/" target="_blank" rel="noopener noreferrer" className="underline hover:no-underline">
-             Webpalm
-           </a>
-          </p>
-       
+              <p className="px-5 pb-6 text-center text-[13px] text-muted lg:hidden">
+                  Design by{" "}
+                   <a href="https://www.webpalm.ie/" target="_blank" rel="noopener noreferrer" className="underline hover:no-underline">
+                   Webpalm
+               </a>
+              </p>
+        
       </section>
     </div>
   );
