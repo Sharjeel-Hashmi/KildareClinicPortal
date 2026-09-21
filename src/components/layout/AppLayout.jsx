@@ -26,7 +26,7 @@ function SidebarContent({ onNavigate }) {
       <div className="flex items-center gap-3 px-5 pb-5 pt-6">
         <LogoMark className="h-10 w-auto" />
         <div className="min-w-0">
-          <Wordmark className="h-[13px] w-auto text-white" />
+          <Wordmark className="h-6 w-auto text-white" />
           <p className="mt-1.5 text-[13px] text-[#a9a79d]">Doctor portal</p>
         </div>
       </div>
@@ -101,7 +101,7 @@ export default function AppLayout() {
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between bg-ink px-4 lg:hidden">
         <div className="flex items-center gap-2.5">
           <LogoMark className="h-8 w-auto" />
-          <Wordmark className="h-[11px] w-auto text-white" />
+          <Wordmark className="h-6 w-auto text-white" />
         </div>
         <button
           type="button"
