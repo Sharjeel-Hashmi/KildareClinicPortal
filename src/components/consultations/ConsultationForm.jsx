@@ -8,6 +8,7 @@ import { validateConsultation } from '../../utils/validators.js';
 import { toLocalInput, toDateInput, todayInput } from '../../utils/format.js';
 import Panel from '../ui/Panel.jsx';
 import Button from '../ui/Button.jsx';
+import ConfirmDialog from '../ui/ConfirmDialog.jsx';
 import { TextField, TextAreaField, ChoiceGroup, CheckGroup } from '../ui/Field.jsx';
 
 const TYPES = [
@@ -80,6 +81,7 @@ export default function ConsultationForm({ initial, submitLabel, onSave, onCance
   const form = useForm(initial);
   const { values, set, bind } = form;
   const [saving, setSaving] = useState(false);
+  const [confirmCancel, setConfirmCancel] = useState(false);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -270,13 +272,25 @@ export default function ConsultationForm({ initial, submitLabel, onSave, onCance
       </Panel>
 
       <div className="sticky bottom-0 z-20 -mx-4 flex items-center justify-end gap-2 border-t border-line bg-white/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
-        <Button variant="secondary" onClick={onCancel} disabled={saving}>
+        <Button variant="secondary" onClick={() => setConfirmCancel(true)} disabled={saving}>
           Cancel
         </Button>
         <Button type="submit" loading={saving}>
           {submitLabel}
         </Button>
       </div>
+      <ConfirmDialog
+        open={confirmCancel}
+        title="Cancel this form?"
+        message="Are you sure you want to cancel? Anything you have entered will not be saved."
+        confirmLabel="Yes, cancel"
+        cancelLabel="No, keep editing"
+        onConfirm={() => {
+          setConfirmCancel(false);
+          onCancel();
+        }}
+        onCancel={() => setConfirmCancel(false)}
+      />
     </form>
   );
 }

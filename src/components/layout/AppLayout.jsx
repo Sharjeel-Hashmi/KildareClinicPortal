@@ -12,6 +12,7 @@ import {
 import { useAuth } from '../../context/AuthContext.jsx';
 import { LogoMark, Wordmark } from '../ui/Logo.jsx';
 import Button from '../ui/Button.jsx';
+import ConfirmDialog from '../ui/ConfirmDialog.jsx';
 
 const NAV = [
   { to: '/dashboard', label: 'Dashboard', icon: PiSquaresFour },
@@ -21,6 +22,7 @@ const NAV = [
 
 function SidebarContent({ onNavigate }) {
   const { user, logout } = useAuth();
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
   return (
     <div className="flex h-full flex-col bg-ink text-white">
       <div className="flex items-center gap-3 px-5 pb-5 pt-6">
@@ -72,13 +74,22 @@ function SidebarContent({ onNavigate }) {
         </div>
         <button
           type="button"
-          onClick={logout}
+          onClick={() => setConfirmSignOut(true)}
           className="flex h-10 w-full items-center gap-2.5 rounded-lg px-3 text-[15px] font-medium text-[#c4c2b8] transition-colors hover:bg-ink-2 hover:text-white"
         >
           <PiSignOut size={20} aria-hidden="true" />
           Sign out
         </button>
       </div>
+
+      <ConfirmDialog
+        open={confirmSignOut}
+        title="Sign out?"
+        message="Are you sure you want to sign out? Anything you have not saved will be lost."
+        confirmLabel="Sign out"
+        onConfirm={logout}
+        onCancel={() => setConfirmSignOut(false)}
+      />
     </div>
   );
 }

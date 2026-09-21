@@ -8,6 +8,7 @@ export default function ConfirmDialog({
   title,
   message,
   confirmLabel = 'Delete',
+  cancelLabel = 'Cancel',
   onConfirm,
   onCancel,
   loading = false,
@@ -41,7 +42,7 @@ export default function ConfirmDialog({
         <p className="mt-2 text-[15px] leading-relaxed text-muted">{message}</p>
         <div className="mt-6 flex justify-end gap-2">
           <Button variant="secondary" onClick={onCancel} disabled={loading} autoFocus>
-            Cancel
+            {cancelLabel}
           </Button>
           <Button variant="danger" onClick={onConfirm} loading={loading}>
             {confirmLabel}
