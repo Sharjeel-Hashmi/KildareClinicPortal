@@ -36,7 +36,13 @@ export function AuthProvider({ children }) {
     return res.user;
   }, []);
 
-  const value = useMemo(() => ({ user, loading, login, logout }), [user, loading, login, logout]);
+  // Called after a successful "My profile" save so the sidebar / header update immediately
+  const updateUser = useCallback((next) => setUser(next), []);
+
+  const value = useMemo(
+    () => ({ user, loading, login, logout, updateUser }),
+    [user, loading, login, logout, updateUser]
+  );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

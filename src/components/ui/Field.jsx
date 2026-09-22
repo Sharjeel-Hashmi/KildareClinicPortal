@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react';
-import { PiCalendarBlank, PiCheckBold } from 'react-icons/pi';
+import { PiCalendarBlank, PiCheckBold, PiEye, PiEyeSlash } from 'react-icons/pi';
 
 /* ── Text inputs ─────────────────────────────────────────── */
 const inputBase =
@@ -74,6 +74,35 @@ export function TextField({ label, hint, error, required, className = '', id, su
             {suffix}
           </span>
         )}
+      </div>
+    </Field>
+  );
+}
+
+// Password input with a show/hide toggle
+export function PasswordField({ label, hint, error, required, className = '', id, ...props }) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <Field label={label} htmlFor={id} error={error} hint={hint} required={required} className={className}>
+      <div className="relative">
+        <input
+          id={id}
+          aria-invalid={error ? 'true' : undefined}
+          aria-describedby={describedBy(id, error, hint)}
+          required={required}
+          className={`h-11 ${inputBase} ${error ? inputBad : inputOk} pr-12`}
+          type={visible ? 'text' : 'password'}
+          {...props}
+        />
+        <button
+          type="button"
+          onClick={() => setVisible((v) => !v)}
+          aria-label={visible ? 'Hide password' : 'Show password'}
+          aria-pressed={visible}
+          className="absolute inset-y-0 right-1.5 flex w-9 items-center justify-center text-muted hover:text-ink"
+        >
+          {visible ? <PiEyeSlash size={20} aria-hidden="true" /> : <PiEye size={20} aria-hidden="true" />}
+        </button>
       </div>
     </Field>
   );

@@ -7,6 +7,7 @@ import {
   PiArrowRight,
   PiClipboardText,
   PiCaretRight,
+  PiIdentificationCard,
 } from 'react-icons/pi';
 import { statsApi } from '../api/services.js';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -113,7 +114,9 @@ export default function Dashboard() {
                         </span>
                         <span className="min-w-0 flex-1">
                           <span className="block truncate font-semibold">{fullName(c.patient)}</span>
-                          <span className="block truncate text-sm text-muted">{c.mainComplaint}</span>
+                          <span className="block truncate text-sm text-muted">
+                            {c.mainComplaint} · Seen by {c.clinician}
+                          </span>
                         </span>
                         <Badge tone={c.consultationType === 'new' ? 'gold' : 'neutral'}>
                           {TYPE_LABEL[c.consultationType]}
@@ -160,6 +163,52 @@ export default function Dashboard() {
               )}
             </Panel>
           </div>
+
+          {user?.role === 'admin' && data.teamActivity && (
+            <Panel
+              title="Team activity"
+              icon={PiIdentificationCard}
+              bodyClassName="p-0"
+              action={
+                <Link to="/doctors" className="inline-flex items-center gap-1 text-sm font-semibold text-gold-700 hover:underline">
+                  All doctors <PiArrowRight size={16} aria-hidden="true" />
+                </Link>
+              }
+            >
+              {data.teamActivity.length === 0 ? (
+                <EmptyState
+                  icon={PiIdentificationCard}
+                  title="No doctors yet"
+                  message="Add doctor accounts from the Doctors page."
+                  action={
+                    <Button variant="secondary" to="/doctors/new">
+                      Add doctor
+                    </Button>
+                  }
+                />
+              ) : (
+                <ul className="divide-y divide-line">
+                  {data.teamActivity.map((d) => (
+                    <li key={d.id}>
+                      <Link
+                        to={`/doctors/${d.id}/activity`}
+                        className="flex items-center gap-4 px-5 py-3.5 transition-colors hover:bg-gold-50/60"
+                      >
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate font-semibold">{d.name}</span>
+                          <span className="block truncate text-sm text-muted">IMC {d.imcNumber || '—'}</span>
+                        </span>
+                        <span className="shrink-0 text-sm font-semibold tabular-nums text-gold-700">
+                          {d.count} {d.count === 1 ? 'patient' : 'patients'} this month
+                        </span>
+                        <PiCaretRight size={16} className="shrink-0 text-muted" aria-hidden="true" />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Panel>
+          )}
         </div>
       )}
     </>

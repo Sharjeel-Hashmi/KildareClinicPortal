@@ -14,6 +14,8 @@ import {
   PiWarning,
   PiCaretRight,
   PiCheckCircle,
+  PiPrescription,
+  PiFileText,
 } from 'react-icons/pi';
 import { patientsApi } from '../api/services.js';
 import { getErrorMessage } from '../api/client.js';
@@ -46,12 +48,16 @@ export default function PatientProfile() {
 
   const patientQ = useFetch(() => patientsApi.get(id), [id]);
   const visitsQ = useFetch(() => patientsApi.consultations(id), [id]);
+  const rxQ = useFetch(() => patientsApi.prescriptions(id), [id]);
+  const certsQ = useFetch(() => patientsApi.certificates(id), [id]);
 
   if (patientQ.loading) return <Spinner />;
   if (patientQ.error) return <ErrorState message={patientQ.error} onRetry={patientQ.reload} />;
 
   const p = patientQ.data.patient;
   const visits = visitsQ.data?.consultations || [];
+  const prescriptions = rxQ.data?.prescriptions || [];
+  const certificates = certsQ.data?.certificates || [];
   const address = [p.addressLine1, p.addressLine2, p.eircode].filter(Boolean).join('\n');
   const ec = p.emergencyContact || {};
 
@@ -93,6 +99,12 @@ export default function PatientProfile() {
           <div className="flex flex-wrap items-center gap-2">
             <Button to={`/patients/${id}/consultations/new`} icon={PiNotePencil}>
               New consultation
+            </Button>
+            <Button variant="secondary" icon={PiPrescription} to={`/patients/${id}/prescriptions/new`}>
+              Add prescription
+            </Button>
+            <Button variant="secondary" icon={PiFileText} to={`/patients/${id}/certificates/new`}>
+              Add medical certificate
             </Button>
             <Button variant="secondary" icon={PiPencilSimple} to={`/patients/${id}/edit`}>
               Edit
@@ -179,6 +191,91 @@ export default function PatientProfile() {
                       <PiCaretRight
                         size={18}
                         className="mt-1 shrink-0 text-muted transition-transform group-hover:translate-x-0.5"
+                        aria-hidden="true"
+                      />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Panel>
+
+          <Panel
+            title={`Prescriptions${rxQ.data ? ` (${prescriptions.length})` : ''}`}
+            icon={PiPrescription}
+            bodyClassName="p-0"
+            className="mt-6"
+            action={
+              <Button size="sm" variant="secondary" to={`/patients/${id}/prescriptions/new`} icon={PiPrescription}>
+                New
+              </Button>
+            }
+          >
+            {rxQ.loading ? (
+              <Spinner />
+            ) : rxQ.error ? (
+              <ErrorState message={rxQ.error} onRetry={rxQ.reload} />
+            ) : prescriptions.length === 0 ? (
+              <EmptyState icon={PiPrescription} title="No prescriptions yet" />
+            ) : (
+              <ul className="divide-y divide-line">
+                {prescriptions.map((rx) => (
+                  <li key={rx._id}>
+                    <Link
+                      to={`/prescriptions/${rx._id}`}
+                      className="group flex items-center gap-4 px-5 py-3.5 transition-colors hover:bg-gold-50/60"
+                    >
+                      <span className="w-[4.5rem] shrink-0 text-sm font-semibold text-ink">
+                        {formatDate(rx.date)}
+                      </span>
+                      <span className="min-w-0 flex-1 truncate text-sm text-muted">{rx.medication}</span>
+                      <PiCaretRight
+                        size={18}
+                        className="shrink-0 text-muted transition-transform group-hover:translate-x-0.5"
+                        aria-hidden="true"
+                      />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Panel>
+
+          <Panel
+            title={`Medical certificates${certsQ.data ? ` (${certificates.length})` : ''}`}
+            icon={PiFileText}
+            bodyClassName="p-0"
+            className="mt-6"
+            action={
+              <Button size="sm" variant="secondary" to={`/patients/${id}/certificates/new`} icon={PiFileText}>
+                New
+              </Button>
+            }
+          >
+            {certsQ.loading ? (
+              <Spinner />
+            ) : certsQ.error ? (
+              <ErrorState message={certsQ.error} onRetry={certsQ.reload} />
+            ) : certificates.length === 0 ? (
+              <EmptyState icon={PiFileText} title="No medical certificates yet" />
+            ) : (
+              <ul className="divide-y divide-line">
+                {certificates.map((c) => (
+                  <li key={c._id}>
+                    <Link
+                      to={`/certificates/${c._id}`}
+                      className="group flex items-center gap-4 px-5 py-3.5 transition-colors hover:bg-gold-50/60"
+                    >
+                      <span className="w-[4.5rem] shrink-0 text-sm font-semibold text-ink">
+                        {formatDate(c.dateOfConsultation)}
+                      </span>
+                      <Badge tone={c.certification === 'unfit' ? 'danger' : 'ok'}>
+                        {c.certification === 'unfit' ? 'Unfit' : 'Fit'}
+                      </Badge>
+                      <span className="min-w-0 flex-1 truncate text-sm text-muted">{c.diagnosis}</span>
+                      <PiCaretRight
+                        size={18}
+                        className="shrink-0 text-muted transition-transform group-hover:translate-x-0.5"
                         aria-hidden="true"
                       />
                     </Link>

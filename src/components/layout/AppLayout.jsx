@@ -1,5 +1,3 @@
-import { useEffect, useState } from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import {
   PiSquaresFour,
   PiUsersThree,
@@ -8,7 +6,10 @@ import {
   PiSignOut,
   PiList,
   PiX,
+  PiIdentificationCard,
 } from 'react-icons/pi';
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { LogoMark, Wordmark } from '../ui/Logo.jsx';
 import Button from '../ui/Button.jsx';
@@ -19,6 +20,8 @@ const NAV = [
   { to: '/patients', label: 'Patients', icon: PiUsersThree },
   { to: '/consultations', label: 'Consultations', icon: PiStethoscope },
 ];
+
+const ADMIN_NAV = [{ to: '/doctors', label: 'Doctors', icon: PiIdentificationCard }];
 
 function SidebarContent({ onNavigate }) {
   const { user, logout } = useAuth();
@@ -40,7 +43,7 @@ function SidebarContent({ onNavigate }) {
       </div>
 
       <nav aria-label="Main" className="flex-1 space-y-1 px-3">
-        {NAV.map(({ to, label, icon: Icon }) => (
+        {[...NAV, ...(user?.role === 'admin' ? ADMIN_NAV : [])].map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}
             to={to}
@@ -60,7 +63,11 @@ function SidebarContent({ onNavigate }) {
       </nav>
 
       <div className="border-t border-ink-3 p-4">
-        <div className="mb-3 flex items-center gap-3">
+        <Link
+          to="/profile"
+          onClick={onNavigate}
+          className="mb-3 flex items-center gap-3 rounded-lg px-1 py-1 transition-colors hover:bg-ink-2"
+        >
           <span
             aria-hidden="true"
             className="grid size-10 shrink-0 place-items-center rounded-full bg-gold-500 font-display font-bold text-ink"
@@ -71,7 +78,7 @@ function SidebarContent({ onNavigate }) {
             <p className="truncate text-[15px] font-semibold">{user?.name}</p>
             <p className="truncate text-[13px] text-[#a9a79d]">{user?.email}</p>
           </div>
-        </div>
+        </Link>
         <button
           type="button"
           onClick={() => setConfirmSignOut(true)}

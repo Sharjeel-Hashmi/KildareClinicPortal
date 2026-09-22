@@ -3,6 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext.jsx';
 import { PrintProvider } from './context/PrintContext.jsx';
 import ProtectedRoute from './components/layout/ProtectedRoute.jsx';
+import AdminRoute from './components/layout/AdminRoute.jsx';
 import AppLayout from './components/layout/AppLayout.jsx';
 import PrintRoot from './components/print/PrintRoot.jsx';
 import Login from './pages/Login.jsx';
@@ -13,6 +14,14 @@ import PatientProfile from './pages/PatientProfile.jsx';
 import ConsultationFormPage from './pages/ConsultationFormPage.jsx';
 import ConsultationView from './pages/ConsultationView.jsx';
 import Consultations from './pages/Consultations.jsx';
+import PrescriptionFormPage from './pages/PrescriptionFormPage.jsx';
+import PrescriptionView from './pages/PrescriptionView.jsx';
+import CertificateFormPage from './pages/CertificateFormPage.jsx';
+import CertificateView from './pages/CertificateView.jsx';
+import Doctors from './pages/Doctors.jsx';
+import DoctorFormPage from './pages/DoctorFormPage.jsx';
+import DoctorActivity from './pages/DoctorActivity.jsx';
+import Profile from './pages/Profile.jsx';
 import NotFound from './pages/NotFound.jsx';
 
 export default function App() {
@@ -33,10 +42,24 @@ export default function App() {
                 <Route path="/patients/:id" element={<PatientProfile />} />
                 <Route path="/patients/:id/edit" element={<PatientFormPage />} />
                 <Route path="/patients/:patientId/consultations/new" element={<ConsultationFormPage />} />
+                <Route path="/patients/:patientId/prescriptions/new" element={<PrescriptionFormPage />} />
+                <Route path="/patients/:patientId/certificates/new" element={<CertificateFormPage />} />
 
                 <Route path="/consultations" element={<Consultations />} />
                 <Route path="/consultations/:id" element={<ConsultationView />} />
                 <Route path="/consultations/:id/edit" element={<ConsultationFormPage />} />
+
+                <Route path="/prescriptions/:id" element={<PrescriptionView />} />
+                <Route path="/certificates/:id" element={<CertificateView />} />
+
+                <Route path="/profile" element={<Profile />} />
+
+                <Route element={<AdminRoute />}>
+                  <Route path="/doctors" element={<Doctors />} />
+                  <Route path="/doctors/new" element={<DoctorFormPage />} />
+                  <Route path="/doctors/:id/edit" element={<DoctorFormPage />} />
+                  <Route path="/doctors/:id/activity" element={<DoctorActivity />} />
+                </Route>
 
                 <Route path="*" element={<NotFound />} />
               </Route>

@@ -23,3 +23,41 @@ export function validateConsultation(v) {
   if (v.allergyStatus === 'yes' && !v.allergyDetails.trim()) e.allergyDetails = 'Describe the allergy';
   return e;
 }
+
+export function validatePrescription(v) {
+  const e = {};
+  if (!v.date) e.date = 'Enter the date';
+  if (!v.medication.trim()) e.medication = 'Enter the medication';
+  return e;
+}
+
+export function validateCertificate(v) {
+  const e = {};
+  if (!v.dateOfConsultation) e.dateOfConsultation = 'Enter the date of consultation';
+  if (!v.certification) e.certification = 'Select fit or unfit for work';
+  if (v.periodFrom && v.periodTo && v.periodFrom > v.periodTo) e.periodTo = 'End date cannot be before the start date';
+  return e;
+}
+
+// Doctor account created / edited by the Super Admin
+export function validateDoctorAccount(v, { editing }) {
+  const e = {};
+  if (!v.name.trim()) e.name = 'Enter the full name';
+  if (!v.email.trim()) e.email = 'Enter an email address';
+  else if (!EMAIL_RX.test(v.email.trim())) e.email = 'Enter a valid email address';
+  if (v.role === 'doctor' && !v.imcNumber.trim()) e.imcNumber = 'Enter the IMC registration number';
+  if (!editing && (!v.password || v.password.length < 8)) e.password = 'Enter a password of at least 8 characters';
+  if (editing && v.password && v.password.length < 8) e.password = 'Password must be at least 8 characters';
+  return e;
+}
+
+// "My profile" — the signed-in user editing their own account
+export function validateProfile(v) {
+  const e = {};
+  if (!v.name.trim()) e.name = 'Enter your full name';
+  if (!v.email.trim()) e.email = 'Enter an email address';
+  else if (!EMAIL_RX.test(v.email.trim())) e.email = 'Enter a valid email address';
+  if (v.role === 'doctor' && !v.imcNumber.trim()) e.imcNumber = 'Enter your IMC registration number';
+  if (v.password && v.password.length < 8) e.password = 'Password must be at least 8 characters';
+  return e;
+}
