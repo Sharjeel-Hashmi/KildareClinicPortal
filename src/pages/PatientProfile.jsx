@@ -351,7 +351,7 @@ export default function PatientProfile() {
                       aria-label={`Delete report from ${r.labName}`}
                       className="grid size-8 shrink-0 place-items-center rounded-lg text-muted hover:bg-danger-50 hover:text-danger"
                     >
-                      <PiTrashIcon size={18} aria-hidden="true" />
+                      <PiTrash size={18} aria-hidden="true" />
                     </button>
                   </li>
                 ))}
