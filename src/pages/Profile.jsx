@@ -10,6 +10,7 @@ import PageHeader from '../components/ui/PageHeader.jsx';
 import Panel from '../components/ui/Panel.jsx';
 import Button from '../components/ui/Button.jsx';
 import Badge from '../components/ui/Badge.jsx';
+import FileUpload from '../components/ui/FileUpload.jsx';
 import { TextField, PasswordField } from '../components/ui/Field.jsx';
 
 export default function Profile() {
@@ -25,6 +26,24 @@ export default function Profile() {
   });
   const { values, bind } = form;
   const [saving, setSaving] = useState(false);
+  const [signatureUrl, setSignatureUrl] = useState(user?.signatureUrl || '');
+  const [savingSignature, setSavingSignature] = useState(false);
+
+  const handleSignatureChange = async (url) => {
+    const previous = signatureUrl;
+    setSignatureUrl(url);
+    setSavingSignature(true);
+    try {
+      const res = await authApi.updateMe({ signatureUrl: url });
+      updateUser(res.user);
+      toast.success(url ? 'Signature updated' : 'Signature removed');
+    } catch (err) {
+      setSignatureUrl(previous);
+      toast.error(getErrorMessage(err));
+    } finally {
+      setSavingSignature(false);
+    }
+  };
 
   const submit = async (e) => {
     e.preventDefault();
@@ -94,6 +113,21 @@ export default function Profile() {
               {...bind('password')}
             />
           </div>
+        </Panel>
+
+        <Panel title="Signature">
+          <FileUpload
+            kind="signature"
+            accept="image/png,image/jpeg,image/webp"
+            shape="card"
+            value={signatureUrl}
+            onChange={handleSignatureChange}
+            hint={
+              savingSignature
+                ? 'Saving…'
+                : 'Used on printed prescriptions and medical certificates. PNG or JPG, ideally with a transparent background.'
+            }
+          />
         </Panel>
 
         <div className="sticky bottom-0 z-20 -mx-4 flex items-center justify-end gap-2 border-t border-line bg-white/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">

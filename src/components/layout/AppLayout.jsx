@@ -7,6 +7,7 @@ import {
   PiList,
   PiX,
   PiIdentificationCard,
+  PiGearSix,
 } from 'react-icons/pi';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -22,6 +23,7 @@ const NAV = [
 ];
 
 const ADMIN_NAV = [{ to: '/doctors', label: 'Doctors', icon: PiIdentificationCard }];
+const SETTINGS_NAV = [{ to: '/settings', label: 'Settings', icon: PiGearSix }];
 
 function SidebarContent({ onNavigate }) {
   const { user, logout } = useAuth();
@@ -43,7 +45,11 @@ function SidebarContent({ onNavigate }) {
       </div>
 
       <nav aria-label="Main" className="flex-1 space-y-1 px-3">
-        {[...NAV, ...(user?.role === 'admin' ? ADMIN_NAV : [])].map(({ to, label, icon: Icon }) => (
+        {[
+          ...NAV,
+          ...(user?.role === 'admin' ? ADMIN_NAV : []),
+          ...(user?.role === 'admin' || user?.canManageSettings ? SETTINGS_NAV : []),
+        ].map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}
             to={to}

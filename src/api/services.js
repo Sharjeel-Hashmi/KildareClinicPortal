@@ -20,6 +20,8 @@ export const patientsApi = {
   createPrescription: (id, body) => api.post(`/patients/${id}/prescriptions`, body).then(data),
   certificates: (id) => api.get(`/patients/${id}/certificates`).then(data),
   createCertificate: (id, body) => api.post(`/patients/${id}/certificates`, body).then(data),
+  reports: (id) => api.get(`/patients/${id}/reports`).then(data),
+  createReport: (id, body) => api.post(`/patients/${id}/reports`, body).then(data),
 };
 
 export const consultationsApi = {
@@ -37,6 +39,24 @@ export const prescriptionsApi = {
 export const certificatesApi = {
   get: (id) => api.get(`/certificates/${id}`).then(data),
   remove: (id) => api.delete(`/certificates/${id}`).then(data),
+};
+
+export const medicinesApi = {
+  list: () => api.get('/medicines').then(data),
+  create: (body) => api.post('/medicines', body).then(data),
+  update: (id, body) => api.put(`/medicines/${id}`, body).then(data),
+  remove: (id) => api.delete(`/medicines/${id}`).then(data),
+};
+
+export const labsApi = {
+  list: () => api.get('/labs').then(data),
+  create: (body) => api.post('/labs', body).then(data),
+  remove: (id) => api.delete(`/labs/${id}`).then(data),
+};
+
+export const reportsApi = {
+  get: (id) => api.get(`/reports/${id}`).then(data),
+  remove: (id) => api.delete(`/reports/${id}`).then(data),
 };
 
 export const usersApi = {

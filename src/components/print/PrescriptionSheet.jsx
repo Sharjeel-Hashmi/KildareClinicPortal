@@ -27,8 +27,14 @@ export default function PrescriptionSheet({ prescription: rx }) {
       <p className="mt-1.5 text-[10.5pt]">
         <strong>IMC No.:</strong> {rx.doctorImc}
       </p>
-      <p className="mt-1.5 text-[10.5pt]">
-        <strong>Signature &amp; Date:</strong> {rx.doctorName} &nbsp;&mdash;&nbsp; {formatDate(rx.date)}
+      <p className="mt-1.5 flex items-center gap-2 text-[10.5pt]">
+        <strong>Signature &amp; Date:</strong>
+        {rx.doctorSignatureUrl ? (
+          <img src={rx.doctorSignatureUrl} alt="Doctor's signature" className="h-10 w-auto object-contain" />
+        ) : (
+          rx.doctorName
+        )}
+        &nbsp;&mdash;&nbsp; {formatDate(rx.date)}
       </p>
 
       <SheetFooter />

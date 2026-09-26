@@ -16,8 +16,10 @@ import {
   PiCheckCircle,
   PiPrescription,
   PiFileText,
+  PiFlask,
+  PiDownloadSimple,
 } from 'react-icons/pi';
-import { patientsApi } from '../api/services.js';
+import { patientsApi, reportsApi } from '../api/services.js';
 import { getErrorMessage } from '../api/client.js';
 import useFetch from '../hooks/useFetch.js';
 import { usePrint } from '../context/PrintContext.jsx';
@@ -45,11 +47,14 @@ export default function PatientProfile() {
   const { print } = usePrint();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [confirmDeleteReport, setConfirmDeleteReport] = useState(null);
+  const [deletingReport, setDeletingReport] = useState(false);
 
   const patientQ = useFetch(() => patientsApi.get(id), [id]);
   const visitsQ = useFetch(() => patientsApi.consultations(id), [id]);
   const rxQ = useFetch(() => patientsApi.prescriptions(id), [id]);
   const certsQ = useFetch(() => patientsApi.certificates(id), [id]);
+  const reportsQ = useFetch(() => patientsApi.reports(id), [id]);
 
   if (patientQ.loading) return <Spinner />;
   if (patientQ.error) return <ErrorState message={patientQ.error} onRetry={patientQ.reload} />;
@@ -58,6 +63,7 @@ export default function PatientProfile() {
   const visits = visitsQ.data?.consultations || [];
   const prescriptions = rxQ.data?.prescriptions || [];
   const certificates = certsQ.data?.certificates || [];
+  const reports = reportsQ.data?.reports || [];
   const address = [p.addressLine1, p.addressLine2, p.eircode].filter(Boolean).join('\n');
   const ec = p.emergencyContact || {};
 
@@ -71,6 +77,20 @@ export default function PatientProfile() {
       toast.error(getErrorMessage(err));
       setDeleting(false);
       setConfirmDelete(false);
+    }
+  };
+
+  const removeReport = async () => {
+    setDeletingReport(true);
+    try {
+      await reportsApi.remove(confirmDeleteReport);
+      toast.success('Report deleted');
+      setConfirmDeleteReport(null);
+      reportsQ.reload();
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    } finally {
+      setDeletingReport(false);
     }
   };
 
@@ -105,6 +125,9 @@ export default function PatientProfile() {
             </Button>
             <Button variant="secondary" icon={PiFileText} to={`/patients/${id}/certificates/new`}>
               Add medical certificate
+            </Button>
+            <Button variant="secondary" icon={PiFlask} to={`/patients/${id}/reports/new`}>
+              Add report
             </Button>
             <Button variant="secondary" icon={PiPencilSimple} to={`/patients/${id}/edit`}>
               Edit
@@ -284,6 +307,57 @@ export default function PatientProfile() {
               </ul>
             )}
           </Panel>
+
+          <Panel
+            title={`Reports${reportsQ.data ? ` (${reports.length})` : ''}`}
+            icon={PiFlask}
+            bodyClassName="p-0"
+            className="mt-6"
+            action={
+              <Button size="sm" variant="secondary" to={`/patients/${id}/reports/new`} icon={PiFlask}>
+                New
+              </Button>
+            }
+          >
+            {reportsQ.loading ? (
+              <Spinner />
+            ) : reportsQ.error ? (
+              <ErrorState message={reportsQ.error} onRetry={reportsQ.reload} />
+            ) : reports.length === 0 ? (
+              <EmptyState icon={PiFlask} title="No reports yet" />
+            ) : (
+              <ul className="divide-y divide-line">
+                {reports.map((r) => (
+                  <li key={r._id} className="flex items-center gap-4 px-5 py-3.5">
+                    <span className="w-[4.5rem] shrink-0 text-sm font-semibold text-ink">
+                      {formatDate(r.date)}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate text-sm text-muted">
+                      {r.labName}
+                      {r.notes && <span className="text-muted/70"> · {r.notes}</span>}
+                    </span>
+                    <a
+                      href={r.fileUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={`View report from ${r.labName}`}
+                      className="grid size-8 shrink-0 place-items-center rounded-lg text-muted hover:bg-gold-50 hover:text-ink"
+                    >
+                      <PiDownloadSimple size={18} aria-hidden="true" />
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => setConfirmDeleteReport(r._id)}
+                      aria-label={`Delete report from ${r.labName}`}
+                      className="grid size-8 shrink-0 place-items-center rounded-lg text-muted hover:bg-danger-50 hover:text-danger"
+                    >
+                      <PiTrashIcon size={18} aria-hidden="true" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Panel>
         </div>
 
         <div className="order-2 space-y-6 lg:order-1">
@@ -346,6 +420,16 @@ export default function PatientProfile() {
         loading={deleting}
         onConfirm={remove}
         onCancel={() => setConfirmDelete(false)}
+      />
+
+      <ConfirmDialog
+        open={Boolean(confirmDeleteReport)}
+        title="Delete this report?"
+        message="This permanently deletes the report file. This cannot be undone."
+        confirmLabel="Delete report"
+        loading={deletingReport}
+        onConfirm={removeReport}
+        onCancel={() => setConfirmDeleteReport(null)}
       />
     </>
   );

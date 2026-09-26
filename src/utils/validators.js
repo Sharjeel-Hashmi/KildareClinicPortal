@@ -39,6 +39,15 @@ export function validateCertificate(v) {
   return e;
 }
 
+// Patient report (lab result) upload
+export function validateReport(v) {
+  const e = {};
+  if (!v.labId) e.labId = 'Select the lab';
+  if (!v.date) e.date = 'Enter the report date';
+  if (!v.fileUrl) e.fileUrl = 'Upload a report file (PDF or image)';
+  return e;
+}
+
 // Doctor account created / edited by the Super Admin
 export function validateDoctorAccount(v, { editing }) {
   const e = {};

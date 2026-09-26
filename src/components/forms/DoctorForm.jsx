@@ -6,7 +6,7 @@ import { validateDoctorAccount } from '../../utils/validators.js';
 import Panel from '../ui/Panel.jsx';
 import Button from '../ui/Button.jsx';
 import ConfirmDialog from '../ui/ConfirmDialog.jsx';
-import { TextField, ChoiceGroup, PasswordField } from '../ui/Field.jsx';
+import { TextField, ChoiceGroup, CheckChoice, PasswordField } from '../ui/Field.jsx';
 
 const ROLES = [
   { value: 'doctor', label: 'Doctor' },
@@ -19,6 +19,7 @@ export const emptyDoctor = () => ({
   phone: '',
   imcNumber: '',
   role: 'doctor',
+  canManageSettings: false,
   password: '',
 });
 
@@ -44,6 +45,7 @@ export default function DoctorForm({ initialValues, editing = false, submitLabel
       phone: values.phone.trim(),
       imcNumber: values.imcNumber.trim(),
       role: values.role,
+      canManageSettings: values.role === 'doctor' ? Boolean(values.canManageSettings) : false,
     };
     if (values.password) payload.password = values.password;
 
@@ -84,6 +86,13 @@ export default function DoctorForm({ initialValues, editing = false, submitLabel
               required
             />
           </div>
+          {values.role === 'doctor' && (
+            <div className="sm:col-span-2">
+              <CheckChoice checked={values.canManageSettings} onChange={(v) => set('canManageSettings', v)}>
+                Allow this doctor to manage Settings (medicines &amp; labs)
+              </CheckChoice>
+            </div>
+          )}
           <PasswordField
             label={editing ? 'New password' : 'Password'}
             autoComplete="new-password"

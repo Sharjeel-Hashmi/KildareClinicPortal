@@ -32,6 +32,7 @@ export default function DoctorFormPage() {
         phone: existing.phone || '',
         imcNumber: existing.imcNumber || '',
         role: existing.role,
+        canManageSettings: Boolean(existing.canManageSettings),
         password: '',
       }
     : emptyDoctor();

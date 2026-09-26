@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react';
-import { PiCalendarBlank, PiCheckBold, PiEye, PiEyeSlash } from 'react-icons/pi';
+import { PiCalendarBlank, PiCaretDown, PiCheckBold, PiEye, PiEyeSlash } from 'react-icons/pi';
 
 /* ── Text inputs ─────────────────────────────────────────── */
 const inputBase =
@@ -318,6 +318,32 @@ export function TextAreaField({ label, hint, error, required, className = '', id
         className={`min-h-[5.5rem] resize-y py-2.5 leading-relaxed ${inputBase} ${error ? inputBad : inputOk}`}
         {...props}
       />
+    </Field>
+  );
+}
+
+// Native <select>, styled to match TextField. Used for longer lists (medicines, labs) where
+// chips (ChoiceGroup) would take up too much room.
+export function SelectField({ label, hint, error, required, className = '', id, children, ...props }) {
+  return (
+    <Field label={label} htmlFor={id} error={error} hint={hint} required={required} className={className}>
+      <div className="relative">
+        <select
+          id={id}
+          aria-invalid={error ? 'true' : undefined}
+          aria-describedby={describedBy(id, error, hint)}
+          required={required}
+          className={`h-11 appearance-none pr-10 ${inputBase} ${error ? inputBad : inputOk}`}
+          {...props}
+        >
+          {children}
+        </select>
+        <PiCaretDown
+          size={18}
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-y-0 right-3 my-auto text-muted"
+        />
+      </div>
     </Field>
   );
 }

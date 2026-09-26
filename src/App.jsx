@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext.jsx';
 import { PrintProvider } from './context/PrintContext.jsx';
 import ProtectedRoute from './components/layout/ProtectedRoute.jsx';
 import AdminRoute from './components/layout/AdminRoute.jsx';
+import SettingsRoute from './components/layout/SettingsRoute.jsx';
 import AppLayout from './components/layout/AppLayout.jsx';
 import PrintRoot from './components/print/PrintRoot.jsx';
 import Login from './pages/Login.jsx';
@@ -18,10 +19,12 @@ import PrescriptionFormPage from './pages/PrescriptionFormPage.jsx';
 import PrescriptionView from './pages/PrescriptionView.jsx';
 import CertificateFormPage from './pages/CertificateFormPage.jsx';
 import CertificateView from './pages/CertificateView.jsx';
+import ReportFormPage from './pages/ReportFormPage.jsx';
 import Doctors from './pages/Doctors.jsx';
 import DoctorFormPage from './pages/DoctorFormPage.jsx';
 import DoctorActivity from './pages/DoctorActivity.jsx';
 import Profile from './pages/Profile.jsx';
+import Settings from './pages/Settings.jsx';
 import NotFound from './pages/NotFound.jsx';
 
 export default function App() {
@@ -44,6 +47,7 @@ export default function App() {
                 <Route path="/patients/:patientId/consultations/new" element={<ConsultationFormPage />} />
                 <Route path="/patients/:patientId/prescriptions/new" element={<PrescriptionFormPage />} />
                 <Route path="/patients/:patientId/certificates/new" element={<CertificateFormPage />} />
+                <Route path="/patients/:patientId/reports/new" element={<ReportFormPage />} />
 
                 <Route path="/consultations" element={<Consultations />} />
                 <Route path="/consultations/:id" element={<ConsultationView />} />
@@ -53,6 +57,10 @@ export default function App() {
                 <Route path="/certificates/:id" element={<CertificateView />} />
 
                 <Route path="/profile" element={<Profile />} />
+
+                <Route element={<SettingsRoute />}>
+                  <Route path="/settings" element={<Settings />} />
+                </Route>
 
                 <Route element={<AdminRoute />}>
                   <Route path="/doctors" element={<Doctors />} />

@@ -35,8 +35,13 @@ export default function CertificateSheet({ certificate: c }) {
         <strong>IMC Registration No.:</strong> {c.doctorImc}
       </p>
       <p className="mt-1.5 text-[10.5pt]">
-        <strong>Doctor&rsquo;s Signature:</strong> {c.doctorName}
+        <strong>Doctor&rsquo;s Signature:</strong>
       </p>
+      {c.doctorSignatureUrl ? (
+        <img src={c.doctorSignatureUrl} alt="Doctor's signature" className="mt-1 h-10 w-auto object-contain" />
+      ) : (
+        <p className="mt-1 text-[10.5pt]">{c.doctorName}</p>
+      )}
       <p className="mt-1.5 text-[10.5pt]">
         <strong>Date:</strong> {formatDate(c.dateOfConsultation)}
       </p>
