@@ -18,6 +18,7 @@ import {
   PiFileText,
   PiFlask,
   PiDownloadSimple,
+  PiReceipt,
 } from 'react-icons/pi';
 import { patientsApi, reportsApi } from '../api/services.js';
 import { getErrorMessage } from '../api/client.js';
@@ -55,6 +56,7 @@ export default function PatientProfile() {
   const rxQ = useFetch(() => patientsApi.prescriptions(id), [id]);
   const certsQ = useFetch(() => patientsApi.certificates(id), [id]);
   const reportsQ = useFetch(() => patientsApi.reports(id), [id]);
+  const invoicesQ = useFetch(() => patientsApi.invoices(id), [id]);
 
   if (patientQ.loading) return <Spinner />;
   if (patientQ.error) return <ErrorState message={patientQ.error} onRetry={patientQ.reload} />;
@@ -64,6 +66,7 @@ export default function PatientProfile() {
   const prescriptions = rxQ.data?.prescriptions || [];
   const certificates = certsQ.data?.certificates || [];
   const reports = reportsQ.data?.reports || [];
+  const invoices = invoicesQ.data?.invoices || [];
   const address = [p.addressLine1, p.addressLine2, p.eircode].filter(Boolean).join('\n');
   const ec = p.emergencyContact || {};
 
@@ -128,6 +131,9 @@ export default function PatientProfile() {
             </Button>
             <Button variant="secondary" icon={PiFlask} to={`/patients/${id}/reports/new`}>
               Add report
+            </Button>
+            <Button variant="secondary" icon={PiReceipt} to={`/patients/${id}/invoices/new`}>
+              Create invoice
             </Button>
             <Button variant="secondary" icon={PiPencilSimple} to={`/patients/${id}/edit`}>
               Edit
@@ -353,6 +359,50 @@ export default function PatientProfile() {
                     >
                       <PiTrash size={18} aria-hidden="true" />
                     </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Panel>
+
+          <Panel
+            title={`Invoices${invoicesQ.data ? ` (${invoices.length})` : ''}`}
+            icon={PiReceipt}
+            bodyClassName="p-0"
+            className="mt-6"
+            action={
+              <Button size="sm" variant="secondary" to={`/patients/${id}/invoices/new`} icon={PiReceipt}>
+                New
+              </Button>
+            }
+          >
+            {invoicesQ.loading ? (
+              <Spinner />
+            ) : invoicesQ.error ? (
+              <ErrorState message={invoicesQ.error} onRetry={invoicesQ.reload} />
+            ) : invoices.length === 0 ? (
+              <EmptyState icon={PiReceipt} title="No invoices yet" />
+            ) : (
+              <ul className="divide-y divide-line">
+                {invoices.map((inv) => (
+                  <li key={inv._id}>
+                    <Link
+                      to={`/invoices/${inv._id}`}
+                      className="group flex items-center gap-4 px-5 py-3.5 transition-colors hover:bg-gold-50/60"
+                    >
+                      <span className="w-[4.5rem] shrink-0 text-sm font-semibold text-ink">
+                        {formatDate(inv.date)}
+                      </span>
+                      <span className="min-w-0 flex-1 truncate text-sm text-muted">{inv.receiptNumber}</span>
+                      <span className="shrink-0 text-sm font-semibold tabular-nums text-ink">
+                        €{inv.subtotal.toFixed(2)}
+                      </span>
+                      <PiCaretRight
+                        size={18}
+                        className="shrink-0 text-muted transition-transform group-hover:translate-x-0.5"
+                        aria-hidden="true"
+                      />
+                    </Link>
                   </li>
                 ))}
               </ul>

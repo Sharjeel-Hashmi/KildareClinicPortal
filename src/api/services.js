@@ -22,6 +22,8 @@ export const patientsApi = {
   createCertificate: (id, body) => api.post(`/patients/${id}/certificates`, body).then(data),
   reports: (id) => api.get(`/patients/${id}/reports`).then(data),
   createReport: (id, body) => api.post(`/patients/${id}/reports`, body).then(data),
+  invoices: (id) => api.get(`/patients/${id}/invoices`).then(data),
+  createInvoice: (id, body) => api.post(`/patients/${id}/invoices`, body).then(data),
 };
 
 export const consultationsApi = {
@@ -57,6 +59,20 @@ export const labsApi = {
 export const reportsApi = {
   get: (id) => api.get(`/reports/${id}`).then(data),
   remove: (id) => api.delete(`/reports/${id}`).then(data),
+};
+
+export const invoicesApi = {
+  list: (params) => api.get('/invoices', { params }).then(data),
+  get: (id) => api.get(`/invoices/${id}`).then(data),
+  update: (id, body) => api.put(`/invoices/${id}`, body).then(data),
+  remove: (id) => api.delete(`/invoices/${id}`).then(data),
+};
+
+export const servicesApi = {
+  list: () => api.get('/services').then(data),
+  create: (body) => api.post('/services', body).then(data),
+  update: (id, body) => api.put(`/services/${id}`, body).then(data),
+  remove: (id) => api.delete(`/services/${id}`).then(data),
 };
 
 export const usersApi = {

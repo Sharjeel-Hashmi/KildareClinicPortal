@@ -8,6 +8,7 @@ import {
   PiX,
   PiIdentificationCard,
   PiGearSix,
+  PiReceipt,
 } from 'react-icons/pi';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -20,6 +21,7 @@ const NAV = [
   { to: '/dashboard', label: 'Dashboard', icon: PiSquaresFour },
   { to: '/patients', label: 'Patients', icon: PiUsersThree },
   { to: '/consultations', label: 'Consultations', icon: PiStethoscope },
+  { to: '/invoices', label: 'Invoices', icon: PiReceipt },
 ];
 
 const ADMIN_NAV = [{ to: '/doctors', label: 'Doctors', icon: PiIdentificationCard }];

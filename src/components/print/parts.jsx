@@ -39,5 +39,5 @@ export function Row({ label, children }) {
 }
 
 export const SheetFooter = () => (
-  <footer className="mt-6 text-center text-[10pt] italic">Nua Healthcare Limited</footer>
+  <footer className="mt-6 text-center text-[10pt] italic">Kildare GP Walk-In CLINIC</footer>
 );

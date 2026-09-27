@@ -48,6 +48,17 @@ export function validateReport(v) {
   return e;
 }
 
+// Invoice / receipt raised for a patient
+export function validateInvoice(v) {
+  const e = {};
+  if (!v.date) e.date = 'Enter the date';
+  const validItems = (v.lineItems || []).filter((it) => it.description.trim() && Number(it.amount) > 0);
+  if (!validItems.length) e.lineItems = 'Add at least one line item with a description and amount';
+  if (!v.paymentMethod) e.paymentMethod = 'Select the payment method';
+  if (v.paymentMethod === 'card' && !v.cardLast4.trim()) e.cardLast4 = 'Enter the last 4 digits of the card';
+  return e;
+}
+
 // Doctor account created / edited by the Super Admin
 export function validateDoctorAccount(v, { editing }) {
   const e = {};

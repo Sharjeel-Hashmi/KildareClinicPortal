@@ -20,6 +20,9 @@ import PrescriptionView from './pages/PrescriptionView.jsx';
 import CertificateFormPage from './pages/CertificateFormPage.jsx';
 import CertificateView from './pages/CertificateView.jsx';
 import ReportFormPage from './pages/ReportFormPage.jsx';
+import InvoiceFormPage from './pages/InvoiceFormPage.jsx';
+import InvoiceView from './pages/InvoiceView.jsx';
+import Invoices from './pages/Invoices.jsx';
 import Doctors from './pages/Doctors.jsx';
 import DoctorFormPage from './pages/DoctorFormPage.jsx';
 import DoctorActivity from './pages/DoctorActivity.jsx';
@@ -48,6 +51,10 @@ export default function App() {
                 <Route path="/patients/:patientId/prescriptions/new" element={<PrescriptionFormPage />} />
                 <Route path="/patients/:patientId/certificates/new" element={<CertificateFormPage />} />
                 <Route path="/patients/:patientId/reports/new" element={<ReportFormPage />} />
+                <Route path="/patients/:patientId/invoices/new" element={<InvoiceFormPage />} />
+
+                <Route path="/invoices" element={<Invoices />} />
+                <Route path="/invoices/:id" element={<InvoiceView />} />
 
                 <Route path="/consultations" element={<Consultations />} />
                 <Route path="/consultations/:id" element={<ConsultationView />} />
@@ -67,6 +74,7 @@ export default function App() {
                   <Route path="/doctors/new" element={<DoctorFormPage />} />
                   <Route path="/doctors/:id/edit" element={<DoctorFormPage />} />
                   <Route path="/doctors/:id/activity" element={<DoctorActivity />} />
+                  <Route path="/invoices/:id/edit" element={<InvoiceFormPage />} />
                 </Route>
 
                 <Route path="*" element={<NotFound />} />
