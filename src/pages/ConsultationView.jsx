@@ -19,6 +19,8 @@ import Button from '../components/ui/Button.jsx';
 import Panel from '../components/ui/Panel.jsx';
 import Badge from '../components/ui/Badge.jsx';
 import ConfirmDialog from '../components/ui/ConfirmDialog.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
+import { isSuperAdmin } from '../utils/roles.js';
 import { DetailList, DetailItem } from '../components/ui/Detail.jsx';
 import { Spinner, ErrorState } from '../components/ui/States.jsx';
 import PatientBar from '../components/consultations/PatientBar.jsx';
@@ -46,6 +48,8 @@ export default function ConsultationView() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { print } = usePrint();
+  const { user } = useAuth();
+  const canDelete = isSuperAdmin(user); // deleting is Super Admin only
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -87,9 +91,11 @@ export default function ConsultationView() {
             <Button variant="secondary" icon={PiPrinter} onClick={() => print('consultation', c)}>
               Print
             </Button>
-            <Button variant="dangerGhost" icon={PiTrash} onClick={() => setConfirmDelete(true)} aria-label="Delete consultation">
-              <span className="sr-only sm:not-sr-only">Delete</span>
-            </Button>
+            {canDelete && (
+              <Button variant="dangerGhost" icon={PiTrash} onClick={() => setConfirmDelete(true)} aria-label="Delete consultation">
+                <span className="sr-only sm:not-sr-only">Delete</span>
+              </Button>
+            )}
           </>
         }
       />

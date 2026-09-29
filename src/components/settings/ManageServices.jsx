@@ -7,10 +7,14 @@ import useFetch from '../../hooks/useFetch.js';
 import Panel from '../ui/Panel.jsx';
 import Button from '../ui/Button.jsx';
 import ConfirmDialog from '../ui/ConfirmDialog.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
+import { isAdminLike } from '../../utils/roles.js';
 import { TextField } from '../ui/Field.jsx';
 import { Spinner, ErrorState, EmptyState } from '../ui/States.jsx';
 
 export default function ManageServices() {
+  const { user } = useAuth();
+  const canRemove = isAdminLike(user); // a doctor with Settings access can add/edit but not remove
   const { data, loading, error, reload } = useFetch(() => servicesApi.list(), []);
   const services = data?.services || [];
 
@@ -94,9 +98,11 @@ export default function ManageServices() {
               <span className="font-medium text-ink">{s.name}</span>
               <div className="flex items-center gap-3">
                 <span className="text-[15px] tabular-nums text-muted">€{s.price.toFixed(2)}</span>
-                <Button size="sm" variant="dangerGhost" onClick={() => setConfirmId(s._id)}>
-                  Remove
-                </Button>
+                {canRemove && (
+                  <Button size="sm" variant="dangerGhost" onClick={() => setConfirmId(s._id)}>
+                    Remove
+                  </Button>
+                )}
               </div>
             </li>
           ))}

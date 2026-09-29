@@ -1,3 +1,4 @@
+
 import {
   PiSquaresFour,
   PiUsersThree,
@@ -16,6 +17,7 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import { LogoMark, Wordmark } from '../ui/Logo.jsx';
 import Button from '../ui/Button.jsx';
 import ConfirmDialog from '../ui/ConfirmDialog.jsx';
+import { isAdminLike } from '../../utils/roles.js';
 
 const NAV = [
   { to: '/dashboard', label: 'Dashboard', icon: PiSquaresFour },
@@ -49,8 +51,8 @@ function SidebarContent({ onNavigate }) {
       <nav aria-label="Main" className="flex-1 space-y-1 px-3">
         {[
           ...NAV,
-          ...(user?.role === 'admin' ? ADMIN_NAV : []),
-          ...(user?.role === 'admin' || user?.canManageSettings ? SETTINGS_NAV : []),
+          ...(isAdminLike(user) ? ADMIN_NAV : []),
+          ...(isAdminLike(user) || user?.canManageSettings ? SETTINGS_NAV : []),
         ].map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}

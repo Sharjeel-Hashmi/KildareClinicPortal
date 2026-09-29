@@ -8,6 +8,7 @@ import useFetch from '../hooks/useFetch.js';
 import { usePrint } from '../context/PrintContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { formatDate, fullName } from '../utils/format.js';
+import { isSuperAdmin } from '../utils/roles.js';
 import PageHeader from '../components/ui/PageHeader.jsx';
 import Button from '../components/ui/Button.jsx';
 import Panel from '../components/ui/Panel.jsx';
@@ -32,7 +33,7 @@ export default function InvoiceView() {
 
   const inv = data.invoice;
   const p = inv.patient;
-  const canManage = user?.role === 'admin';
+  const canManage = isSuperAdmin(user); // edit + delete are Super Admin only
 
   const remove = async () => {
     setDeleting(true);

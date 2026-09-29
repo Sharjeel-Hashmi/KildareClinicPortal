@@ -7,10 +7,14 @@ import useFetch from '../../hooks/useFetch.js';
 import Panel from '../ui/Panel.jsx';
 import Button from '../ui/Button.jsx';
 import ConfirmDialog from '../ui/ConfirmDialog.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
+import { isAdminLike } from '../../utils/roles.js';
 import { TextField } from '../ui/Field.jsx';
 import { Spinner, ErrorState, EmptyState } from '../ui/States.jsx';
 
 export default function ManageLabs() {
+  const { user } = useAuth();
+  const canRemove = isAdminLike(user); // a doctor with Settings access can add/edit but not remove
   const { data, loading, error, reload } = useFetch(() => labsApi.list(), []);
   const labs = data?.labs || [];
 
@@ -80,9 +84,11 @@ export default function ManageLabs() {
               className="flex items-center justify-between gap-3 rounded-lg border border-line px-4 py-2.5"
             >
               <span className="font-medium text-ink">{l.name}</span>
-              <Button size="sm" variant="dangerGhost" onClick={() => setConfirmId(l._id)}>
-                Remove
-              </Button>
+              {canRemove && (
+                <Button size="sm" variant="dangerGhost" onClick={() => setConfirmId(l._id)}>
+                  Remove
+                </Button>
+              )}
             </li>
           ))}
         </ul>

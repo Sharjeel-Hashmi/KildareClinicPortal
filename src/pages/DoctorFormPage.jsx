@@ -5,12 +5,15 @@ import useFetch from '../hooks/useFetch.js';
 import PageHeader from '../components/ui/PageHeader.jsx';
 import { Spinner, ErrorState } from '../components/ui/States.jsx';
 import DoctorForm, { emptyDoctor } from '../components/forms/DoctorForm.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
+import { isSuperAdmin } from '../utils/roles.js';
 
 // /doctors/new and /doctors/:id/edit
 export default function DoctorFormPage() {
   const { id } = useParams();
   const editing = Boolean(id);
   const navigate = useNavigate();
+  const { user: me } = useAuth();
 
   const { data, loading, error, reload } = useFetch(
     () => (editing ? usersApi.list() : Promise.resolve(null)),
@@ -33,6 +36,7 @@ export default function DoctorFormPage() {
         imcNumber: existing.imcNumber || '',
         role: existing.role,
         canManageSettings: Boolean(existing.canManageSettings),
+        isActive: existing.isActive !== false,
         password: '',
       }
     : emptyDoctor();
@@ -53,7 +57,7 @@ export default function DoctorFormPage() {
       <PageHeader
         back={{ to: '/doctors', label: 'Doctors' }}
         title={editing ? `Edit ${existing.name}` : 'Add doctor'}
-        subtitle={editing ? undefined : 'Create a sign-in for a doctor or another administrator'}
+        subtitle={editing ? undefined : isSuperAdmin(me) ? 'Create a sign-in for a doctor or an admin' : 'Create a sign-in for a doctor'}
       />
       <DoctorForm
         key={id || 'new'}

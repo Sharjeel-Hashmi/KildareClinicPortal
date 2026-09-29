@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { authApi } from '../api/services.js';
 import { getErrorMessage, getFieldErrors } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import { isAdminLike, roleLabel } from '../utils/roles.js';
 import useForm from '../hooks/useForm.js';
 import { validateProfile } from '../utils/validators.js';
 import PageHeader from '../components/ui/PageHeader.jsx';
@@ -87,9 +88,7 @@ export default function Profile() {
         title="My profile"
         subtitle={
           <span className="inline-flex items-center gap-2">
-            <Badge tone={user?.role === 'admin' ? 'gold' : 'neutral'}>
-              {user?.role === 'admin' ? 'Administrator' : 'Doctor'}
-            </Badge>
+            <Badge tone={isAdminLike(user) ? 'gold' : 'neutral'}>{roleLabel(user?.role)}</Badge>
           </span>
         }
       />

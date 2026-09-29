@@ -7,10 +7,14 @@ import useFetch from '../../hooks/useFetch.js';
 import Panel from '../ui/Panel.jsx';
 import Button from '../ui/Button.jsx';
 import ConfirmDialog from '../ui/ConfirmDialog.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
+import { isAdminLike } from '../../utils/roles.js';
 import { TextField } from '../ui/Field.jsx';
 import { Spinner, ErrorState, EmptyState } from '../ui/States.jsx';
 
 export default function ManageMedications() {
+  const { user } = useAuth();
+  const canRemove = isAdminLike(user); // a doctor with Settings access can add/edit but not remove
   const { data, loading, error, reload } = useFetch(() => medicinesApi.list(), []);
   const medicines = data?.medicines || [];
 
@@ -102,9 +106,11 @@ export default function ManageMedications() {
             <li key={m._id} className="rounded-lg border border-line px-4 py-3.5">
               <div className="flex items-start justify-between gap-3">
                 <p className="font-semibold text-ink">{m.name}</p>
-                <Button size="sm" variant="dangerGhost" onClick={() => setConfirmId(m._id)}>
-                  Remove
-                </Button>
+                {canRemove && (
+                  <Button size="sm" variant="dangerGhost" onClick={() => setConfirmId(m._id)}>
+                    Remove
+                  </Button>
+                )}
               </div>
               {m.dosages.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-2">
@@ -114,14 +120,16 @@ export default function ManageMedications() {
                       className="inline-flex items-center gap-1.5 rounded-full bg-gold-50 py-1 pl-3 pr-1.5 text-sm font-medium text-ink"
                     >
                       {d}
-                      <button
-                        type="button"
-                        onClick={() => removeDosage(m, d)}
-                        aria-label={`Remove dosage ${d}`}
-                        className="grid size-5 place-items-center rounded-full text-muted hover:bg-danger-50 hover:text-danger"
-                      >
-                        <PiTrash size={13} aria-hidden="true" />
-                      </button>
+                      {canRemove && (
+                        <button
+                          type="button"
+                          onClick={() => removeDosage(m, d)}
+                          aria-label={`Remove dosage ${d}`}
+                          className="grid size-5 place-items-center rounded-full text-muted hover:bg-danger-50 hover:text-danger"
+                        >
+                          <PiTrash size={13} aria-hidden="true" />
+                        </button>
+                      )}
                     </span>
                   ))}
                 </div>

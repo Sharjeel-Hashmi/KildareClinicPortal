@@ -11,6 +11,7 @@ import {
 } from 'react-icons/pi';
 import { statsApi } from '../api/services.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import { isAdminLike } from '../utils/roles.js';
 import useFetch from '../hooks/useFetch.js';
 import {
   greeting,
@@ -164,7 +165,7 @@ export default function Dashboard() {
             </Panel>
           </div>
 
-          {user?.role === 'admin' && data.teamActivity && (
+          {isAdminLike(user) && data.teamActivity && (
             <Panel
               title="Team activity"
               icon={PiIdentificationCard}

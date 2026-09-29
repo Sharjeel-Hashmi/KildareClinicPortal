@@ -39,6 +39,8 @@ import Panel from '../components/ui/Panel.jsx';
 import Avatar from '../components/ui/Avatar.jsx';
 import Badge from '../components/ui/Badge.jsx';
 import ConfirmDialog from '../components/ui/ConfirmDialog.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
+import { isSuperAdmin } from '../utils/roles.js';
 import { DetailList, DetailItem } from '../components/ui/Detail.jsx';
 import { Spinner, ErrorState, EmptyState } from '../components/ui/States.jsx';
 
@@ -46,6 +48,8 @@ export default function PatientProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { print } = usePrint();
+  const { user } = useAuth();
+  const canDelete = isSuperAdmin(user); // deleting is Super Admin only
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [confirmDeleteReport, setConfirmDeleteReport] = useState(null);
@@ -141,9 +145,11 @@ export default function PatientProfile() {
             <Button variant="secondary" icon={PiPrinter} onClick={() => print('patient', p)}>
               Print
             </Button>
-            <Button variant="dangerGhost" icon={PiTrash} onClick={() => setConfirmDelete(true)} aria-label="Delete patient">
-              <span className="sr-only sm:not-sr-only">Delete</span>
-            </Button>
+            {canDelete && (
+              <Button variant="dangerGhost" icon={PiTrash} onClick={() => setConfirmDelete(true)} aria-label="Delete patient">
+                <span className="sr-only sm:not-sr-only">Delete</span>
+              </Button>
+            )}
           </div>
         </div>
 
@@ -351,14 +357,16 @@ export default function PatientProfile() {
                     >
                       <PiDownloadSimple size={18} aria-hidden="true" />
                     </a>
-                    <button
-                      type="button"
-                      onClick={() => setConfirmDeleteReport(r._id)}
-                      aria-label={`Delete report from ${r.labName}`}
-                      className="grid size-8 shrink-0 place-items-center rounded-lg text-muted hover:bg-danger-50 hover:text-danger"
-                    >
-                      <PiTrash size={18} aria-hidden="true" />
-                    </button>
+                    {canDelete && (
+                      <button
+                        type="button"
+                        onClick={() => setConfirmDeleteReport(r._id)}
+                        aria-label={`Delete report from ${r.labName}`}
+                        className="grid size-8 shrink-0 place-items-center rounded-lg text-muted hover:bg-danger-50 hover:text-danger"
+                      >
+                        <PiTrash size={18} aria-hidden="true" />
+                      </button>
+                    )}
                   </li>
                 ))}
               </ul>

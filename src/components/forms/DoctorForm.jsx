@@ -3,6 +3,8 @@ import toast from 'react-hot-toast';
 import useForm from '../../hooks/useForm.js';
 import { getErrorMessage, getFieldErrors } from '../../api/client.js';
 import { validateDoctorAccount } from '../../utils/validators.js';
+import { useAuth } from '../../context/AuthContext.jsx';
+import { isSuperAdmin } from '../../utils/roles.js';
 import Panel from '../ui/Panel.jsx';
 import Button from '../ui/Button.jsx';
 import ConfirmDialog from '../ui/ConfirmDialog.jsx';
@@ -10,7 +12,7 @@ import { TextField, ChoiceGroup, CheckChoice, PasswordField } from '../ui/Field.
 
 const ROLES = [
   { value: 'doctor', label: 'Doctor' },
-  { value: 'admin', label: 'Administrator' },
+  { value: 'admin', label: 'Admin' },
 ];
 
 export const emptyDoctor = () => ({
@@ -20,10 +22,13 @@ export const emptyDoctor = () => ({
   imcNumber: '',
   role: 'doctor',
   canManageSettings: false,
+  isActive: true,
   password: '',
 });
 
 export default function DoctorForm({ initialValues, editing = false, submitLabel, onSave, onCancel }) {
+  const { user: me } = useAuth();
+  const superAdmin = isSuperAdmin(me); // only the Super Admin can pick a role (create Admins)
   const form = useForm(initialValues || emptyDoctor());
   const { values, set, bind } = form;
   const [saving, setSaving] = useState(false);
@@ -44,9 +49,11 @@ export default function DoctorForm({ initialValues, editing = false, submitLabel
       email: values.email.trim(),
       phone: values.phone.trim(),
       imcNumber: values.imcNumber.trim(),
-      role: values.role,
+      // An Admin can only ever create/manage doctors; the server enforces this too
+      role: superAdmin ? values.role : 'doctor',
       canManageSettings: values.role === 'doctor' ? Boolean(values.canManageSettings) : false,
     };
+    if (editing) payload.isActive = Boolean(values.isActive);
     if (values.password) payload.password = values.password;
 
     setSaving(true);
@@ -76,20 +83,29 @@ export default function DoctorForm({ initialValues, editing = false, submitLabel
             hint={values.role === 'admin' ? 'Only needed if this admin also sees patients' : undefined}
             {...bind('imcNumber')}
           />
-          <div className="sm:col-span-2">
-            <ChoiceGroup
-              legend="Role"
-              name="role"
-              value={values.role}
-              onChange={(v) => set('role', v)}
-              options={ROLES}
-              required
-            />
-          </div>
+          {superAdmin && (
+            <div className="sm:col-span-2">
+              <ChoiceGroup
+                legend="Role"
+                name="role"
+                value={values.role}
+                onChange={(v) => set('role', v)}
+                options={ROLES}
+                required
+              />
+            </div>
+          )}
           {values.role === 'doctor' && (
             <div className="sm:col-span-2">
               <CheckChoice checked={values.canManageSettings} onChange={(v) => set('canManageSettings', v)}>
-                Allow this doctor to manage Settings (medicines &amp; labs)
+                Allow this doctor to manage Settings (add &amp; edit medicines, labs, services)
+              </CheckChoice>
+            </div>
+          )}
+          {editing && (
+            <div className="sm:col-span-2">
+              <CheckChoice checked={values.isActive} onChange={(v) => set('isActive', v)}>
+                Account is active (can sign in)
               </CheckChoice>
             </div>
           )}

@@ -74,6 +74,9 @@ export default function App() {
                   <Route path="/doctors/new" element={<DoctorFormPage />} />
                   <Route path="/doctors/:id/edit" element={<DoctorFormPage />} />
                   <Route path="/doctors/:id/activity" element={<DoctorActivity />} />
+                </Route>
+
+                <Route element={<AdminRoute superOnly />}>
                   <Route path="/invoices/:id/edit" element={<InvoiceFormPage />} />
                 </Route>
 

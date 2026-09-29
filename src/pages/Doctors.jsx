@@ -1,10 +1,20 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { PiUserPlus, PiUsersThree, PiPencilSimple, PiTrash, PiIdentificationCard, PiClockCounterClockwise } from 'react-icons/pi';
+import {
+  PiUserPlus,
+  PiUsersThree,
+  PiPencilSimple,
+  PiTrash,
+  PiIdentificationCard,
+  PiClockCounterClockwise,
+  PiProhibit,
+  PiCheckCircle,
+} from 'react-icons/pi';
 import { usersApi } from '../api/services.js';
 import { getErrorMessage } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import { isSuperAdmin, isAdminLike, roleLabel } from '../utils/roles.js';
 import useFetch from '../hooks/useFetch.js';
 import PageHeader from '../components/ui/PageHeader.jsx';
 import Button from '../components/ui/Button.jsx';
@@ -14,9 +24,11 @@ import { SkeletonRows, EmptyState, ErrorState } from '../components/ui/States.js
 
 export default function Doctors() {
   const { user: me } = useAuth();
+  const superAdmin = isSuperAdmin(me); // only the Super Admin sees Delete and other Admin accounts
   const navigate = useNavigate();
   const [confirmId, setConfirmId] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [togglingId, setTogglingId] = useState(null);
 
   const { data, loading, error, reload } = useFetch(() => usersApi.list(), []);
   const users = data?.users || [];
@@ -36,11 +48,32 @@ export default function Doctors() {
     }
   };
 
+  // Deactivate / re-activate: the account keeps all its records but cannot sign in
+  const toggleActive = async (u) => {
+    setTogglingId(u.id);
+    try {
+      await usersApi.update(u.id, { isActive: !u.isActive });
+      toast.success(u.isActive ? `${u.name} deactivated` : `${u.name} re-activated`);
+      reload();
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
+  const roleBadge = (u) => (
+    <span className="inline-flex flex-wrap items-center gap-1.5">
+      <Badge tone={isAdminLike(u) ? 'gold' : 'neutral'}>{roleLabel(u.role)}</Badge>
+      {u.isActive === false && <Badge tone="danger">Inactive</Badge>}
+    </span>
+  );
+
   return (
     <>
       <PageHeader
         title="Doctors"
-        subtitle="Doctor and administrator accounts for the portal"
+        subtitle={superAdmin ? 'Doctor and administrator accounts for the portal' : 'Doctor accounts for the portal'}
         actions={
           <Button to="/doctors/new" icon={PiUserPlus}>
             Add doctor
@@ -102,42 +135,54 @@ export default function Doctors() {
                         {u.consultationCount}
                       </Link>
                     </td>
+                    <td className="px-3 py-3">{roleBadge(u)}</td>
                     <td className="px-3 py-3">
-                      <Badge tone={u.role === 'admin' ? 'gold' : 'neutral'}>
-                        {u.role === 'admin' ? 'Admin' : 'Doctor'}
-                      </Badge>
-                    </td>
-                    <td className="px-3 py-3">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          icon={PiClockCounterClockwise}
-                          onClick={() => navigate(`/doctors/${u.id}/activity`)}
-                          aria-label={`View ${u.name}'s activity`}
-                        >
-                          <span className="sr-only">Activity</span>
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          icon={PiPencilSimple}
-                          onClick={() => navigate(`/doctors/${u.id}/edit`)}
-                          aria-label={`Edit ${u.name}`}
-                        >
-                          <span className="sr-only">Edit</span>
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="dangerGhost"
-                          icon={PiTrash}
-                          onClick={() => setConfirmId(u.id)}
-                          disabled={u.id === me?.id}
-                          aria-label={`Delete ${u.name}`}
-                        >
-                          <span className="sr-only">Delete</span>
-                        </Button>
-                      </div>
+                      {u.role !== 'super_admin' && (
+                        <div className="flex items-center justify-end gap-1.5">
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            icon={PiClockCounterClockwise}
+                            onClick={() => navigate(`/doctors/${u.id}/activity`)}
+                            aria-label={`View ${u.name}'s activity`}
+                          >
+                            <span className="sr-only">Activity</span>
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            icon={PiPencilSimple}
+                            onClick={() => navigate(`/doctors/${u.id}/edit`)}
+                            aria-label={`Edit ${u.name}`}
+                          >
+                            <span className="sr-only">Edit</span>
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            icon={u.isActive === false ? PiCheckCircle : PiProhibit}
+                            onClick={() => toggleActive(u)}
+                            loading={togglingId === u.id}
+                            disabled={u.id === me?.id}
+                            aria-label={`${u.isActive === false ? 'Re-activate' : 'Deactivate'} ${u.name}`}
+                            title={u.isActive === false ? 'Re-activate account' : 'Deactivate account'}
+                          >
+                            <span className="sr-only">{u.isActive === false ? 'Re-activate' : 'Deactivate'}</span>
+                          </Button>
+                          {superAdmin && (
+                            <Button
+                              size="sm"
+                              variant="dangerGhost"
+                              icon={PiTrash}
+                              onClick={() => setConfirmId(u.id)}
+                              disabled={u.id === me?.id}
+                              aria-label={`Delete ${u.name}`}
+                            >
+                              <span className="sr-only">Delete</span>
+                            </Button>
+                          )}
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -165,7 +210,7 @@ export default function Doctors() {
                       {u.consultationCount} patients seen
                     </Link>
                   </span>
-                  <Badge tone={u.role === 'admin' ? 'gold' : 'neutral'}>{u.role === 'admin' ? 'Admin' : 'Doctor'}</Badge>
+                  {roleBadge(u)}
                 </li>
               ))}
             </ul>
