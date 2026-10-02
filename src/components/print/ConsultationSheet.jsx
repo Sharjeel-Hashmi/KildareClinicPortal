@@ -36,12 +36,10 @@ export default function ConsultationSheet({ consultation: c }) {
 
       <Section n={2} title="Presenting Complaint">
         <Row label="Main Complaint / Reason for Attendance">{c.mainComplaint}</Row>
-        <Row label="History of Presenting Complaint">{c.historyOfPresentingComplaint}</Row>
       </Section>
 
       <Section n={3} title="Relevant History">
         <Row label="Past Medical History">{c.pastMedicalHistory}</Row>
-        <Row label="Surgical History">{c.surgicalHistory}</Row>
         <Row label="Current Medications">{c.currentMedications}</Row>
         <Row label="Allergies">
           <span className="mr-4 inline-block">
@@ -53,12 +51,11 @@ export default function ConsultationSheet({ consultation: c }) {
             Yes{c.allergyStatus === 'yes' && c.allergyDetails ? `: ${c.allergyDetails}` : ''}
           </span>
         </Row>
-        <Row label="Family / Social History">{c.familySocialHistory}</Row>
       </Section>
 
       <Section n={4} title="Examination & Observations">
         <Row label="Observations / Vitals">
-          {`BP: ${v.bp || '—'}   Pulse: ${v.pulse || '—'}   Temp: ${v.temp || '—'}   SpO₂: ${v.spo2 || '—'}\nWeight: ${v.weight || '—'}   Other: ${v.other || '—'}`}
+          {`BP: ${v.bp || '—'}   Pulse: ${v.pulse || '—'}   Temp: ${v.temp || '—'}   SpO₂: ${v.spo2 || '—'}`}
         </Row>
         <Row label="Clinical Examination / Findings">{c.examinationFindings}</Row>
       </Section>
@@ -80,17 +77,12 @@ export default function ConsultationSheet({ consultation: c }) {
             other={c.referralOther}
           />
         </Row>
-        <Row label="Follow-up / Review">{c.followUp}</Row>
       </Section>
 
       <Section n={6} title="Prescription">
         <Row label="Medication / Prescription">{rx.medication}</Row>
         <Row label="Dose / Frequency / Duration">{rx.dose}</Row>
         <Row label="Prescriber Signature">{rx.prescriberSignature}</Row>
-      </Section>
-
-      <Section n={7} title="Additional Notes">
-        <Row label="Notes">{c.notes}</Row>
       </Section>
 
       <p className="mt-4 text-[10.5pt]">

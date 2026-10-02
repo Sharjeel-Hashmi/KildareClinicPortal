@@ -84,4 +84,9 @@
   body {
     background: #fff;
   }
+  /* keep the dark letterhead and shaded rows when printing */
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 }

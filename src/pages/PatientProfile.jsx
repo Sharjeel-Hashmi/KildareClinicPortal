@@ -8,7 +8,6 @@ import {
   PiNotePencil,
   PiAddressBook,
   PiHeartbeat,
-  PiPhoneCall,
   PiIdentificationCard,
   PiStethoscope,
   PiWarning,
@@ -72,7 +71,6 @@ export default function PatientProfile() {
   const reports = reportsQ.data?.reports || [];
   const invoices = invoicesQ.data?.invoices || [];
   const address = [p.addressLine1, p.addressLine2, p.eircode].filter(Boolean).join('\n');
-  const ec = p.emergencyContact || {};
 
   const remove = async () => {
     setDeleting(true);
@@ -448,22 +446,11 @@ export default function PatientProfile() {
             </DetailList>
           </Panel>
 
-          <Panel title="Emergency contact" icon={PiPhoneCall}>
-            <DetailList cols={2}>
-              <DetailItem label="Name">{ec.name}</DetailItem>
-              <DetailItem label="Relationship">{ec.relationship}</DetailItem>
-              <DetailItem label="Telephone">{ec.phone}</DetailItem>
-            </DetailList>
-          </Panel>
-
           <Panel title="Registration" icon={PiIdentificationCard}>
             <DetailList>
               <DetailItem label="Reason for registration">{p.reasonForRegistration}</DetailItem>
               <DetailItem label="Clinic information provided to patient">
                 {p.infoProvided ? 'Yes' : 'Not recorded'}
-              </DetailItem>
-              <DetailItem label="Additional notes" multiline>
-                {p.notes}
               </DetailItem>
             </DetailList>
           </Panel>

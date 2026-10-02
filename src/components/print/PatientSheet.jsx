@@ -2,7 +2,6 @@ import { SheetHeader, Section, Row, Box, SheetFooter } from './parts.jsx';
 import { formatDate, SEX_LABEL } from '../../utils/format.js';
 
 export default function PatientSheet({ patient: p }) {
-  const ec = p.emergencyContact || {};
   const address = [p.addressLine1, p.addressLine2].filter(Boolean).join('\n');
 
   return (
@@ -46,13 +45,7 @@ export default function PatientSheet({ patient: p }) {
         </Row>
       </Section>
 
-      <Section n={3} title="Emergency Contact">
-        <Row label="Name">{ec.name}</Row>
-        <Row label="Relationship">{ec.relationship}</Row>
-        <Row label="Telephone">{ec.phone}</Row>
-      </Section>
-
-      <Section n={4} title="Registration / Administrative">
+      <Section n={3} title="Registration / Administrative">
         <Row label="Reason for Registration">{p.reasonForRegistration}</Row>
         <Row label="Consent / Information Provided">
           <Box checked={p.infoProvided} />
@@ -72,7 +65,6 @@ export default function PatientSheet({ patient: p }) {
             Other{p.preferredContact === 'other' && p.preferredContactOther ? `: ${p.preferredContactOther}` : ''}
           </span>
         </Row>
-        <Row label="Additional Notes">{p.notes}</Row>
       </Section>
 
       <SheetFooter />

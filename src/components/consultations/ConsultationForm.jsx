@@ -166,18 +166,12 @@ export default function ConsultationForm({ initial, submitLabel, onSave, onCance
             rows={2}
             {...bind('mainComplaint')}
           />
-          <TextAreaField
-            label="History of presenting complaint"
-            rows={5}
-            {...bind('historyOfPresentingComplaint')}
-          />
         </div>
       </Panel>
 
       <Panel step={3} title="Relevant history">
         <div className="grid gap-5 sm:grid-cols-2">
           <TextAreaField label="Past medical history" {...bind('pastMedicalHistory')} />
-          <TextAreaField label="Surgical history" {...bind('surgicalHistory')} />
           <TextAreaField label="Current medications" {...bind('currentMedications')} />
           <div className="space-y-3">
             <ChoiceGroup
@@ -191,11 +185,6 @@ export default function ConsultationForm({ initial, submitLabel, onSave, onCance
               <TextField label="Allergy details" required {...bind('allergyDetails')} />
             )}
           </div>
-          <TextAreaField
-            label="Family / social history"
-            className="sm:col-span-2"
-            {...bind('familySocialHistory')}
-          />
         </div>
       </Panel>
 
@@ -203,13 +192,11 @@ export default function ConsultationForm({ initial, submitLabel, onSave, onCance
         <div className="grid gap-5">
           <div>
             <p className="mb-1.5 text-sm font-medium text-ink">Observations / vitals</p>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               <TextField label="BP" suffix="mmHg" placeholder="120/80" {...bind('vitals.bp')} />
               <TextField label="Pulse" suffix="bpm" inputMode="numeric" {...bind('vitals.pulse')} />
               <TextField label="Temp" suffix="°C" inputMode="decimal" {...bind('vitals.temp')} />
               <TextField label="SpO₂" suffix="%" inputMode="numeric" {...bind('vitals.spo2')} />
-              <TextField label="Weight" suffix="kg" inputMode="decimal" {...bind('vitals.weight')} />
-              <TextField label="Other" className="col-span-2 sm:col-span-3 lg:col-span-1" {...bind('vitals.other')} />
             </div>
           </div>
           <TextAreaField label="Clinical examination / findings" rows={5} {...bind('examinationFindings')} />
@@ -240,7 +227,6 @@ export default function ConsultationForm({ initial, submitLabel, onSave, onCance
             />
             {values.referral.includes('other') && <TextField label="Other referral" {...bind('referralOther')} />}
           </div>
-          <TextField label="Follow-up / review" placeholder="e.g. Review in 2 weeks" {...bind('followUp')} />
         </div>
       </Panel>
 
@@ -263,9 +249,8 @@ export default function ConsultationForm({ initial, submitLabel, onSave, onCance
         </div>
       </Panel>
 
-      <Panel step={7} title="Additional notes">
+      <Panel step={7} title="Clinician signature">
         <div className="grid gap-5">
-          <TextAreaField label="Notes" rows={4} {...bind('notes')} />
           <div className="flex flex-wrap items-end gap-3">
             <TextField label="Clinician signature" className="min-w-[14rem] flex-1" {...bind('clinicianSignature')} />
             <TextField label="Date" type="date" className="w-44" {...bind('signatureDate')} />

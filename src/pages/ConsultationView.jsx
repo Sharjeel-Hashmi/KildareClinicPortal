@@ -30,7 +30,6 @@ const VITALS = [
   ['pulse', 'Pulse', 'bpm'],
   ['temp', 'Temp', '°C'],
   ['spo2', 'SpO₂', '%'],
-  ['weight', 'Weight', 'kg'],
 ];
 
 const chips = (values = [], labels, other) =>
@@ -62,7 +61,7 @@ export default function ConsultationView() {
   const p = c.patient;
   const v = c.vitals || {};
   const rx = c.prescription || {};
-  const hasVitals = VITALS.some(([k]) => v[k]) || v.other;
+  const hasVitals = VITALS.some(([k]) => v[k]);
 
   const remove = async () => {
     setDeleting(true);
@@ -119,9 +118,6 @@ export default function ConsultationView() {
             <DetailItem label="Main complaint / reason for attendance" multiline>
               {c.mainComplaint}
             </DetailItem>
-            <DetailItem label="History of presenting complaint" multiline>
-              {c.historyOfPresentingComplaint}
-            </DetailItem>
           </DetailList>
         </Panel>
 
@@ -129,9 +125,6 @@ export default function ConsultationView() {
           <DetailList cols={2}>
             <DetailItem label="Past medical history" multiline>
               {c.pastMedicalHistory}
-            </DetailItem>
-            <DetailItem label="Surgical history" multiline>
-              {c.surgicalHistory}
             </DetailItem>
             <DetailItem label="Current medications" multiline>
               {c.currentMedications}
@@ -141,9 +134,6 @@ export default function ConsultationView() {
               {c.allergyStatus === 'yes' && (
                 <span className="font-semibold text-danger">{c.allergyDetails || 'Yes'}</span>
               )}
-            </DetailItem>
-            <DetailItem label="Family / social history" multiline wide>
-              {c.familySocialHistory}
             </DetailItem>
           </DetailList>
         </Panel>
@@ -160,12 +150,6 @@ export default function ConsultationView() {
                       <span className="text-sm text-muted"> {unit}</span>
                     </span>
                   ))}
-                  {v.other && (
-                    <span>
-                      <span className="text-muted">Other </span>
-                      <span className="font-semibold">{v.other}</span>
-                    </span>
-                  )}
                 </span>
               )}
             </DetailItem>
@@ -187,7 +171,6 @@ export default function ConsultationView() {
               {chips(c.investigations, INVESTIGATION_LABEL, c.investigationsOther)}
             </DetailItem>
             <DetailItem label="Referral">{chips(c.referral, REFERRAL_LABEL, c.referralOther)}</DetailItem>
-            <DetailItem label="Follow-up / review">{c.followUp}</DetailItem>
           </DetailList>
         </Panel>
 
@@ -201,11 +184,8 @@ export default function ConsultationView() {
           </DetailList>
         </Panel>
 
-        <Panel step={7} title="Additional notes">
+        <Panel step={7} title="Clinician signature">
           <DetailList cols={2}>
-            <DetailItem label="Notes" multiline wide>
-              {c.notes}
-            </DetailItem>
             <DetailItem label="Clinician signature">{c.clinicianSignature}</DetailItem>
             <DetailItem label="Date">{c.signatureDate && formatDate(c.signatureDate)}</DetailItem>
           </DetailList>

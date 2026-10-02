@@ -1,13 +1,28 @@
-import { LogoFull } from '../ui/Logo.jsx';
+import { LogoMark } from '../ui/Logo.jsx';
 
 // Paper-form building blocks that mirror the clinic's Word templates.
 export const Box = ({ checked }) => <span className="mr-1 inline-block w-[1.1em]">{checked ? '☒' : '☐'}</span>;
 
+// Receipt-style letterhead shared by every print sheet.
+// `title` is the document name; the line under the clinic name follows it ("Private Practice · Prescription").
 export function SheetHeader({ title }) {
   return (
-    <header className="mb-5 text-center">
-      <LogoFull size={44} />
-      <h1 className="mt-3 text-[16pt] font-bold">{title}</h1>
+    <header className="mb-5">
+      <div className="flex items-center justify-between rounded-lg bg-ink px-5 py-4 text-white">
+        <div className="flex items-center gap-3">
+          <LogoMark className="h-9 w-auto" />
+          <div>
+            <p className="text-[14pt] font-bold leading-tight">KILDARE GP Walk-In CLINIC</p>
+            <p className="text-[8.5pt] uppercase tracking-wide text-gold-200">Private Practice · {title}</p>
+          </div>
+        </div>
+        <div className="text-right text-[9pt] leading-relaxed text-[#d8d6cc]">
+          <p>Claregate Street, Kildare, R51 P635</p>
+          <p>Tel (085) 867 8192</p>
+          <p>info@kildaredoc.ie</p>
+        </div>
+      </div>
+      <h1 className="mt-5 text-[18pt] font-bold">{title}</h1>
     </header>
   );
 }

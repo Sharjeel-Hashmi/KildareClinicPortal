@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import MedicineSelector, { appendLine } from '../prescription/MedicineSelector.jsx';
 import toast from 'react-hot-toast';
 import useForm from '../../hooks/useForm.js';
 import { getErrorMessage, getFieldErrors } from '../../api/client.js';
@@ -51,6 +52,10 @@ const SEX = [
   { value: 'male', label: 'Male' },
   { value: 'other', label: 'Other / Prefer not to say' },
 ];
+const MEDICATION = [
+  { value: 'none', label: 'None' },
+  { value: 'yes', label: 'Yes' },
+];
 const ALLERGY = [
   { value: 'none', label: 'None known' },
   { value: 'yes', label: 'Yes' },
@@ -66,6 +71,8 @@ export default function PatientForm({ initial, patientNo, submitLabel, onSave, o
   const { values, set, bind } = form;
   const [saving, setSaving] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
+  // Current medication: None / Yes. Existing text means Yes; None clears the box.
+  const [medStatus, setMedStatus] = useState(initial?.medications ? 'yes' : '');
   const [duplicate, setDuplicate] = useState(null); // { message, payload } when the server flags a double registration
 
   const submit = async (e) => {
@@ -180,7 +187,24 @@ export default function PatientForm({ initial, patientNo, submitLabel, onSave, o
         <div className="grid gap-5">
           <TextField label="Usual GP / GP practice" {...bind('usualGp')} />
           <TextAreaField label="Previous / relevant medical conditions" {...bind('medicalConditions')} />
-          <TextAreaField label="Current medication(s)" {...bind('medications')} />
+          <div className="space-y-3">
+            <ChoiceGroup
+              legend="Current medication(s)"
+              name="medicationStatus"
+              value={medStatus}
+              onChange={(v) => {
+                setMedStatus(v);
+                if (v === 'none') set('medications', '');
+              }}
+              options={MEDICATION}
+            />
+            {medStatus === 'yes' && (
+              <>
+                <MedicineSelector onAdd={(line) => set('medications', appendLine(values.medications, line))} />
+                <TextAreaField label="Medication list" {...bind('medications')} />
+              </>
+            )}
+          </div>
           <div className="space-y-3">
             <ChoiceGroup
               legend="Allergies"
@@ -201,15 +225,7 @@ export default function PatientForm({ initial, patientNo, submitLabel, onSave, o
         </div>
       </Panel>
 
-      <Panel step={3} title="Emergency contact">
-        <div className="grid gap-5 sm:grid-cols-3">
-          <TextField label="Name" {...bind('emergencyContact.name')} />
-          <TextField label="Relationship" {...bind('emergencyContact.relationship')} />
-          <TextField label="Telephone" type="tel" inputMode="tel" {...bind('emergencyContact.phone')} />
-        </div>
-      </Panel>
-
-      <Panel step={4} title="Registration / administrative">
+      <Panel step={3} title="Registration / administrative">
         <div className="grid gap-5">
           <TextField label="Reason for registration" {...bind('reasonForRegistration')} />
           <div>
@@ -239,7 +255,6 @@ export default function PatientForm({ initial, patientNo, submitLabel, onSave, o
               />
             )}
           </div>
-          <TextAreaField label="Additional notes" rows={3} {...bind('notes')} />
         </div>
       </Panel>
 
