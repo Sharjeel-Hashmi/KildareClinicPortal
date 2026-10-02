@@ -7,6 +7,7 @@ import { getErrorMessage, getFieldErrors } from '../../api/client.js';
 import { validateConsultation } from '../../utils/validators.js';
 import { toLocalInput, toDateInput, todayInput } from '../../utils/format.js';
 import Panel from '../ui/Panel.jsx';
+import MedicineSelector, { appendLine } from '../prescription/MedicineSelector.jsx';
 import Button from '../ui/Button.jsx';
 import ConfirmDialog from '../ui/ConfirmDialog.jsx';
 import { TextField, TextAreaField, ChoiceGroup, CheckGroup } from '../ui/Field.jsx';
@@ -120,6 +121,9 @@ export default function ConsultationForm({ initial, submitLabel, onSave, onCance
       setSaving(false);
     }
   };
+
+  const insertMedication = (line) =>
+    set('prescription.medication', appendLine(values.prescription.medication, line));
 
   // Signing is a deliberate click — never pre-filled
   const signPrescriber = () => set('prescription.prescriberSignature', user?.name || '');
@@ -243,6 +247,7 @@ export default function ConsultationForm({ initial, submitLabel, onSave, onCance
       <Panel step={6} title="Prescription">
         <div className="grid gap-5">
           <TextAreaField label="Medication / prescription" {...bind('prescription.medication')} />
+          <MedicineSelector onAdd={insertMedication} />
           <TextField label="Dose / frequency / duration" {...bind('prescription.dose')} />
           <div className="flex flex-wrap items-end gap-3">
             <TextField

@@ -50,6 +50,13 @@ export const medicinesApi = {
   remove: (id) => api.delete(`/medicines/${id}`).then(data),
 };
 
+export const medicineCategoriesApi = {
+  list: () => api.get('/medicine-categories').then(data),
+  create: (body) => api.post('/medicine-categories', body).then(data),
+  update: (id, body) => api.put(`/medicine-categories/${id}`, body).then(data),
+  remove: (id) => api.delete(`/medicine-categories/${id}`).then(data),
+};
+
 export const labsApi = {
   list: () => api.get('/labs').then(data),
   create: (body) => api.post('/labs', body).then(data),

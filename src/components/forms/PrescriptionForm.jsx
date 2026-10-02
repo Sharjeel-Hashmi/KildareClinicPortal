@@ -4,14 +4,13 @@ import { PiWarningCircle } from 'react-icons/pi';
 import useForm from '../../hooks/useForm.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { getErrorMessage, getFieldErrors } from '../../api/client.js';
-import { medicinesApi } from '../../api/services.js';
 import { validatePrescription } from '../../utils/validators.js';
 import { todayInput } from '../../utils/format.js';
-import useFetch from '../../hooks/useFetch.js';
+import MedicineSelector, { appendLine } from '../prescription/MedicineSelector.jsx';
 import Panel from '../ui/Panel.jsx';
 import Button from '../ui/Button.jsx';
 import ConfirmDialog from '../ui/ConfirmDialog.jsx';
-import { TextField, TextAreaField, SelectField } from '../ui/Field.jsx';
+import { TextField, TextAreaField } from '../ui/Field.jsx';
 
 export const newPrescription = () => ({ date: todayInput(), medication: '' });
 
@@ -21,23 +20,9 @@ export default function PrescriptionForm({ submitLabel = 'Save & print', onSave,
   const { values, bind } = form;
   const [saving, setSaving] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
-  const [insertMedicine, setInsertMedicine] = useState('');
-  const [insertDosage, setInsertDosage] = useState('');
   const missingImc = !user?.imcNumber;
 
-  const medicinesQ = useFetch(() => medicinesApi.list(), []);
-  const medicines = medicinesQ.data?.medicines || [];
-  const selectedMedicine = medicines.find((m) => m._id === insertMedicine);
-
-  const insertIntoMedication = () => {
-    if (!selectedMedicine) return;
-    const line = insertDosage ? `${selectedMedicine.name} — ${insertDosage}` : selectedMedicine.name;
-    const current = values.medication;
-    const next = current && !current.endsWith('\n') ? `${current}\n${line}` : `${current}${line}`;
-    form.set('medication', next);
-    setInsertMedicine('');
-    setInsertDosage('');
-  };
+  const insertIntoMedication = (line) => form.set('medication', appendLine(values.medication, line));
 
   const submit = async (e) => {
     e.preventDefault();
@@ -84,41 +69,7 @@ export default function PrescriptionForm({ submitLabel = 'Save & print', onSave,
         <div className="grid gap-5">
           <TextField label="Date" type="date" required className="max-w-xs" {...bind('date')} />
 
-          {medicines.length > 0 && (
-            <div className="grid gap-3 rounded-lg border border-line bg-paper p-3.5 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
-              <SelectField
-                label="Insert medicine"
-                value={insertMedicine}
-                onChange={(e) => {
-                  setInsertMedicine(e.target.value);
-                  setInsertDosage('');
-                }}
-              >
-                <option value="">Select medicine…</option>
-                {medicines.map((m) => (
-                  <option key={m._id} value={m._id}>
-                    {m.name}
-                  </option>
-                ))}
-              </SelectField>
-              <SelectField
-                label="Dosage"
-                value={insertDosage}
-                onChange={(e) => setInsertDosage(e.target.value)}
-                disabled={!selectedMedicine?.dosages?.length}
-              >
-                <option value="">Dosage…</option>
-                {(selectedMedicine?.dosages || []).map((d) => (
-                  <option key={d} value={d}>
-                    {d}
-                  </option>
-                ))}
-              </SelectField>
-              <Button type="button" variant="secondary" onClick={insertIntoMedication} disabled={!selectedMedicine}>
-                Add to prescription
-              </Button>
-            </div>
-          )}
+          <MedicineSelector onAdd={insertIntoMedication} />
 
           <TextAreaField
             label="Medication"
