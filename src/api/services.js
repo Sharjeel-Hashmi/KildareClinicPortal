@@ -18,6 +18,8 @@ export const patientsApi = {
   createConsultation: (id, body) => api.post(`/patients/${id}/consultations`, body).then(data),
   prescriptions: (id) => api.get(`/patients/${id}/prescriptions`).then(data),
   createPrescription: (id, body) => api.post(`/patients/${id}/prescriptions`, body).then(data),
+  referrals: (id) => api.get(`/patients/${id}/referrals`).then(data),
+  createReferral: (id, body) => api.post(`/patients/${id}/referrals`, body).then(data),
   certificates: (id) => api.get(`/patients/${id}/certificates`).then(data),
   createCertificate: (id, body) => api.post(`/patients/${id}/certificates`, body).then(data),
   reports: (id) => api.get(`/patients/${id}/reports`).then(data),
@@ -36,6 +38,11 @@ export const consultationsApi = {
 export const prescriptionsApi = {
   get: (id) => api.get(`/prescriptions/${id}`).then(data),
   remove: (id) => api.delete(`/prescriptions/${id}`).then(data),
+};
+
+export const referralsApi = {
+  get: (id) => api.get(`/referrals/${id}`).then(data),
+  remove: (id) => api.delete(`/referrals/${id}`).then(data),
 };
 
 export const certificatesApi = {

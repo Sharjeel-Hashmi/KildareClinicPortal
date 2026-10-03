@@ -171,6 +171,16 @@ export default function ConsultationView() {
               {chips(c.investigations, INVESTIGATION_LABEL, c.investigationsOther)}
             </DetailItem>
             <DetailItem label="Referral">{chips(c.referral, REFERRAL_LABEL, c.referralOther)}</DetailItem>
+            {c.referralDetails && (
+              <DetailItem label="Referral letter" multiline>
+                {c.referralDetails}
+                {c.referralDoctor?.name && (
+                  <span className="mt-2 block text-sm text-muted">
+                    {c.referralDoctor.name} · IMC No. {c.referralDoctor.imc}
+                  </span>
+                )}
+              </DetailItem>
+            )}
           </DetailList>
         </Panel>
 

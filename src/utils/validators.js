@@ -31,6 +31,14 @@ export function validatePrescription(v) {
   return e;
 }
 
+export function validateReferral(v) {
+  const e = {};
+  if (!v.date) e.date = 'Enter the date';
+  if (!v.referralType) e.referralType = 'Select who the patient is being referred to';
+  if (!v.letter.trim()) e.letter = 'Write the referral letter';
+  return e;
+}
+
 export function validateCertificate(v) {
   const e = {};
   if (!v.dateOfConsultation) e.dateOfConsultation = 'Enter the date of consultation';

@@ -18,6 +18,7 @@ import {
   PiFlask,
   PiDownloadSimple,
   PiReceipt,
+  PiArrowBendUpRight,
 } from 'react-icons/pi';
 import { patientsApi, reportsApi } from '../api/services.js';
 import { getErrorMessage } from '../api/client.js';
@@ -31,6 +32,7 @@ import {
   SEX_LABEL,
   CONTACT_LABEL,
   TYPE_LABEL,
+  REFERRAL_LABEL,
 } from '../utils/format.js';
 import PageHeader from '../components/ui/PageHeader.jsx';
 import Button from '../components/ui/Button.jsx';
@@ -57,6 +59,7 @@ export default function PatientProfile() {
   const patientQ = useFetch(() => patientsApi.get(id), [id]);
   const visitsQ = useFetch(() => patientsApi.consultations(id), [id]);
   const rxQ = useFetch(() => patientsApi.prescriptions(id), [id]);
+  const referralsQ = useFetch(() => patientsApi.referrals(id), [id]);
   const certsQ = useFetch(() => patientsApi.certificates(id), [id]);
   const reportsQ = useFetch(() => patientsApi.reports(id), [id]);
   const invoicesQ = useFetch(() => patientsApi.invoices(id), [id]);
@@ -67,6 +70,7 @@ export default function PatientProfile() {
   const p = patientQ.data.patient;
   const visits = visitsQ.data?.consultations || [];
   const prescriptions = rxQ.data?.prescriptions || [];
+  const referrals = referralsQ.data?.referrals || [];
   const certificates = certsQ.data?.certificates || [];
   const reports = reportsQ.data?.reports || [];
   const invoices = invoicesQ.data?.invoices || [];
@@ -127,6 +131,9 @@ export default function PatientProfile() {
             </Button>
             <Button variant="secondary" icon={PiPrescription} to={`/patients/${id}/prescriptions/new`}>
               Add prescription
+            </Button>
+            <Button variant="secondary" icon={PiArrowBendUpRight} to={`/patients/${id}/referrals/new`}>
+              Add referral
             </Button>
             <Button variant="secondary" icon={PiFileText} to={`/patients/${id}/certificates/new`}>
               Add medical certificate
@@ -262,6 +269,48 @@ export default function PatientProfile() {
                         {formatDate(rx.date)}
                       </span>
                       <span className="min-w-0 flex-1 truncate text-sm text-muted">{rx.medication}</span>
+                      <PiCaretRight
+                        size={18}
+                        className="shrink-0 text-muted transition-transform group-hover:translate-x-0.5"
+                        aria-hidden="true"
+                      />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Panel>
+
+          <Panel
+            title={`Referrals${referralsQ.data ? ` (${referrals.length})` : ''}`}
+            icon={PiArrowBendUpRight}
+            bodyClassName="p-0"
+            className="mt-6"
+            action={
+              <Button size="sm" variant="secondary" to={`/patients/${id}/referrals/new`} icon={PiArrowBendUpRight}>
+                New
+              </Button>
+            }
+          >
+            {referralsQ.loading ? (
+              <Spinner />
+            ) : referralsQ.error ? (
+              <ErrorState message={referralsQ.error} onRetry={referralsQ.reload} />
+            ) : referrals.length === 0 ? (
+              <EmptyState icon={PiArrowBendUpRight} title="No referrals yet" />
+            ) : (
+              <ul className="divide-y divide-line">
+                {referrals.map((rf) => (
+                  <li key={rf._id}>
+                    <Link
+                      to={`/referrals/${rf._id}`}
+                      className="group flex items-center gap-4 px-5 py-3.5 transition-colors hover:bg-gold-50/60"
+                    >
+                      <span className="w-[4.5rem] shrink-0 text-sm font-semibold text-ink">{formatDate(rf.date)}</span>
+                      <span className="min-w-0 flex-1 truncate text-sm text-muted">
+                        {REFERRAL_LABEL[rf.referralType]}
+                        {rf.referredTo ? ` — ${rf.referredTo}` : ''}
+                      </span>
                       <PiCaretRight
                         size={18}
                         className="shrink-0 text-muted transition-transform group-hover:translate-x-0.5"
@@ -460,7 +509,7 @@ export default function PatientProfile() {
       <ConfirmDialog
         open={confirmDelete}
         title="Delete this patient?"
-        message={`This permanently deletes ${fullName(p)} (${p.patientNo}) and all ${visits.length} consultation record${visits.length === 1 ? '' : 's'}. This cannot be undone.`}
+        message={`This permanently deletes ${fullName(p)} (${p.patientNo}) and everything filed under them: ${visits.length} consultation${visits.length === 1 ? '' : 's'}, ${invoices.length} invoice${invoices.length === 1 ? '' : 's'}, ${prescriptions.length} prescription${prescriptions.length === 1 ? '' : 's'}, ${referrals.length} referral${referrals.length === 1 ? '' : 's'}, ${certificates.length} certificate${certificates.length === 1 ? '' : 's'} and ${reports.length} report${reports.length === 1 ? '' : 's'}. This cannot be undone.`}
         confirmLabel="Delete patient"
         loading={deleting}
         onConfirm={remove}

@@ -33,6 +33,9 @@ export default function InvoiceView() {
 
   const inv = data.invoice;
   const p = inv.patient;
+  if (!p) {
+    return <ErrorState message="This invoice is not linked to a patient any more." onRetry={reload} />;
+  }
   const canManage = isSuperAdmin(user); // edit + delete are Super Admin only
 
   const remove = async () => {

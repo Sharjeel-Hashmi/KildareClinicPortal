@@ -75,14 +75,20 @@
   }
 }
 
+/* margin 0 stops the browser printing its own header/footer (page title + URL); the page margin is re-added on #print-root below */
 @page {
   size: A4;
-  margin: 14mm;
+  margin: 0;
 }
 
 @media print {
   body {
     background: #fff;
+  }
+  #print-root {
+    padding: 14mm;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone; /* repeats the padding on every printed page */
   }
   /* keep the dark letterhead and shaded rows when printing */
   * {

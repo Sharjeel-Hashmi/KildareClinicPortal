@@ -28,7 +28,7 @@ const INVESTIGATIONS = [
   { value: 'other', label: 'Other' },
 ];
 const REFERRALS = [
-  { value: 'none', label: 'None', exclusive: true },
+  { value: 'none', label: 'None' },
   { value: 'specialist', label: 'Specialist' },
   { value: 'ed_hospital', label: 'ED / Hospital' },
   { value: 'other', label: 'Other' },
@@ -54,8 +54,9 @@ export const newConsultation = ({ patient, clinician, hasHistory }) => ({
   managementPlan: '',
   investigations: [],
   investigationsOther: '',
-  referral: [],
+  referral: ['none'],
   referralOther: '',
+  referralDetails: '',
   followUp: '',
   prescription: { medication: '', dose: '', prescriberSignature: '' },
   notes: '',
@@ -73,7 +74,7 @@ export const consultationToForm = (c) => {
     vitals: { ...base.vitals, ...(c.vitals || {}) },
     prescription: { ...base.prescription, ...(c.prescription || {}) },
     investigations: c.investigations || [],
-    referral: c.referral || [],
+    referral: c.referral?.length ? c.referral : ['none'],
   };
 };
 
@@ -83,11 +84,20 @@ export default function ConsultationForm({ initial, submitLabel, onSave, onCance
   const { values, set, bind } = form;
   const [saving, setSaving] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
+  const referralType = values.referral?.[0] || 'none';
 
   const submit = async (e) => {
     e.preventDefault();
     const errs = validateConsultation(values);
     if (Object.keys(errs).length) {
+      form.setErrors(errs);
+      form.focusFirstError(errs);
+      toast.error('Please check the highlighted fields', { id: 'form-invalid' });
+      return;
+    }
+
+    if (referralType !== 'none' && !values.referralDetails.trim()) {
+      const errs = { referralDetails: 'Write the referral letter' };
       form.setErrors(errs);
       form.focusFirstError(errs);
       toast.error('Please check the highlighted fields', { id: 'form-invalid' });
@@ -105,6 +115,7 @@ export default function ConsultationForm({ initial, submitLabel, onSave, onCance
       allergyDetails: values.allergyStatus === 'yes' ? values.allergyDetails.trim() : '',
       investigationsOther: values.investigations.includes('other') ? values.investigationsOther.trim() : '',
       referralOther: values.referral.includes('other') ? values.referralOther.trim() : '',
+      referralDetails: referralType !== 'none' ? values.referralDetails.trim() : '',
       signatureDate: values.signatureDate || '',
     };
 
@@ -219,13 +230,27 @@ export default function ConsultationForm({ initial, submitLabel, onSave, onCance
             )}
           </div>
           <div className="space-y-3">
-            <CheckGroup
+            <ChoiceGroup
               legend="Referral"
-              value={values.referral}
-              onChange={(v) => set('referral', v)}
+              name="referral"
+              value={referralType}
+              onChange={(v) => set('referral', [v])}
               options={REFERRALS}
             />
-            {values.referral.includes('other') && <TextField label="Other referral" {...bind('referralOther')} />}
+            {referralType !== 'none' && (
+              <>
+                <TextAreaField
+                  label="Referral letter"
+                  rows={6}
+                  hint="Written to the specialist / hospital. Your name, signature and IMC number are added automatically."
+                  {...bind('referralDetails')}
+                />
+                <p className="text-sm text-muted">
+                  <span className="font-medium text-ink">Doctor:</span> {user?.name} &nbsp;·&nbsp;{' '}
+                  <span className="font-medium text-ink">IMC No.:</span> {user?.imcNumber || '—'}
+                </p>
+              </>
+            )}
           </div>
         </div>
       </Panel>

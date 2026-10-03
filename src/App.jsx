@@ -17,6 +17,8 @@ import ConsultationView from './pages/ConsultationView.jsx';
 import Consultations from './pages/Consultations.jsx';
 import PrescriptionFormPage from './pages/PrescriptionFormPage.jsx';
 import PrescriptionView from './pages/PrescriptionView.jsx';
+import ReferralFormPage from './pages/ReferralFormPage.jsx';
+import ReferralView from './pages/ReferralView.jsx';
 import CertificateFormPage from './pages/CertificateFormPage.jsx';
 import CertificateView from './pages/CertificateView.jsx';
 import ReportFormPage from './pages/ReportFormPage.jsx';
@@ -49,6 +51,7 @@ export default function App() {
                 <Route path="/patients/:id/edit" element={<PatientFormPage />} />
                 <Route path="/patients/:patientId/consultations/new" element={<ConsultationFormPage />} />
                 <Route path="/patients/:patientId/prescriptions/new" element={<PrescriptionFormPage />} />
+                <Route path="/patients/:patientId/referrals/new" element={<ReferralFormPage />} />
                 <Route path="/patients/:patientId/certificates/new" element={<CertificateFormPage />} />
                 <Route path="/patients/:patientId/reports/new" element={<ReportFormPage />} />
                 <Route path="/patients/:patientId/invoices/new" element={<InvoiceFormPage />} />
@@ -61,6 +64,7 @@ export default function App() {
                 <Route path="/consultations/:id/edit" element={<ConsultationFormPage />} />
 
                 <Route path="/prescriptions/:id" element={<PrescriptionView />} />
+                <Route path="/referrals/:id" element={<ReferralView />} />
                 <Route path="/certificates/:id" element={<CertificateView />} />
 
                 <Route path="/profile" element={<Profile />} />

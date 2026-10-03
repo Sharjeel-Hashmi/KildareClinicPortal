@@ -77,6 +77,7 @@ export default function ConsultationSheet({ consultation: c }) {
             other={c.referralOther}
           />
         </Row>
+        {c.referralDetails && <Row label="Referral Letter">{c.referralDetails}</Row>}
       </Section>
 
       <Section n={6} title="Prescription">
@@ -84,6 +85,25 @@ export default function ConsultationSheet({ consultation: c }) {
         <Row label="Dose / Frequency / Duration">{rx.dose}</Row>
         <Row label="Prescriber Signature">{rx.prescriberSignature}</Row>
       </Section>
+
+      {c.referralDetails && c.referralDoctor?.name && (
+        <div className="mt-4 break-inside-avoid text-[10.5pt]">
+          <p>
+            <strong>Referring doctor:</strong> {c.referralDoctor.name}
+            <span className="ml-6">
+              <strong>IMC No.:</strong> {c.referralDoctor.imc}
+            </span>
+          </p>
+          <p className="mt-1.5 flex items-center gap-2">
+            <strong>Referral signature:</strong>
+            {c.referralDoctor.signatureUrl ? (
+              <img src={c.referralDoctor.signatureUrl} alt="Doctor's signature" className="h-10 w-auto object-contain" />
+            ) : (
+              c.referralDoctor.name
+            )}
+          </p>
+        </div>
+      )}
 
       <p className="mt-4 text-[10.5pt]">
         <strong>Clinician signature:</strong> {c.clinicianSignature || '________________________________'}

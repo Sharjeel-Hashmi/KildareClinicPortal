@@ -3,6 +3,7 @@ import PatientSheet from './PatientSheet.jsx';
 import ConsultationSheet from './ConsultationSheet.jsx';
 import PrescriptionSheet from './PrescriptionSheet.jsx';
 import CertificateSheet from './CertificateSheet.jsx';
+import ReferralSheet from './ReferralSheet.jsx';
 import InvoiceSheet from './InvoiceSheet.jsx';
 
 // Hidden on screen; when window.print() runs, this is the ONLY thing shown (see AppLayout `print:hidden`).
@@ -19,6 +20,7 @@ export default function PrintRoot() {
       {job.kind === 'patient' && <PatientSheet patient={job.data} />}
       {job.kind === 'consultation' && <ConsultationSheet consultation={job.data} />}
       {job.kind === 'prescription' && <PrescriptionSheet prescription={job.data} />}
+      {job.kind === 'referral' && <ReferralSheet referral={job.data} />}
       {job.kind === 'certificate' && <CertificateSheet certificate={job.data} />}
       {job.kind === 'invoice' && <InvoiceSheet invoice={job.data} />}
     </div>
