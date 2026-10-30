@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext.jsx';
+import { NotificationProvider } from './context/NotificationContext.jsx';
 import { PrintProvider } from './context/PrintContext.jsx';
 import ProtectedRoute from './components/layout/ProtectedRoute.jsx';
 import AdminRoute from './components/layout/AdminRoute.jsx';
@@ -30,12 +31,17 @@ import DoctorFormPage from './pages/DoctorFormPage.jsx';
 import DoctorActivity from './pages/DoctorActivity.jsx';
 import Profile from './pages/Profile.jsx';
 import Settings from './pages/Settings.jsx';
+import Appointments from './pages/Appointments.jsx';
+import AppointmentFormPage from './pages/AppointmentFormPage.jsx';
+import Availability from './pages/Availability.jsx';
+import AuditLog from './pages/AuditLog.jsx';
 import NotFound from './pages/NotFound.jsx';
 
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <NotificationProvider>
         <PrintProvider>
           <Routes>
             <Route path="/login" element={<Login />} />
@@ -67,6 +73,10 @@ export default function App() {
                 <Route path="/referrals/:id" element={<ReferralView />} />
                 <Route path="/certificates/:id" element={<CertificateView />} />
 
+                <Route path="/appointments" element={<Appointments />} />
+                <Route path="/appointments/new" element={<AppointmentFormPage />} />
+                <Route path="/availability" element={<Availability />} />
+
                 <Route path="/profile" element={<Profile />} />
 
                 <Route element={<SettingsRoute />}>
@@ -81,6 +91,7 @@ export default function App() {
                 </Route>
 
                 <Route element={<AdminRoute superOnly />}>
+                  <Route path="/audit" element={<AuditLog />} />
                   <Route path="/invoices/:id/edit" element={<InvoiceFormPage />} />
                 </Route>
 
@@ -106,6 +117,7 @@ export default function App() {
             }}
           />
         </PrintProvider>
+        </NotificationProvider>
       </AuthProvider>
     </BrowserRouter>
   );

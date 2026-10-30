@@ -1,4 +1,4 @@
-import { SheetHeader, Section, Row, Box, SheetFooter } from './parts.jsx';
+import { SheetHeader, Section, Row, Box, SheetFooter, Stamp } from './parts.jsx';
 import { formatDate, formatDateTime, fullName } from '../../utils/format.js';
 
 const Checks = ({ options, values = [], other }) =>
@@ -111,6 +111,7 @@ export default function ConsultationSheet({ consultation: c }) {
           <strong>Date:</strong> {c.signatureDate ? formatDate(c.signatureDate) : '____ / ____ / ______'}
         </span>
       </p>
+      <Stamp />
 
       <SheetFooter />
     </article>

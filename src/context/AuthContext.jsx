@@ -8,10 +8,19 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(Boolean(localStorage.getItem(TOKEN_KEY)));
 
-  const logout = useCallback(() => {
+  // Forget the session on this device (used when the token has expired: nothing to tell the server)
+  const clearSession = useCallback(() => {
     localStorage.removeItem(TOKEN_KEY);
     setUser(null);
   }, []);
+
+  // "Sign out" button: leave a note in the audit log first (never blocks the sign-out for long)
+  // reason 'inactivity' = signed out automatically after 15 idle minutes (recorded as such in the audit log)
+  const logout = useCallback((reason) => {
+    const note = authApi.logout(typeof reason === 'string' ? reason : undefined).catch(() => {});
+    const wait = new Promise((resolve) => setTimeout(resolve, 1500));
+    Promise.race([note, wait]).finally(clearSession);
+  }, [clearSession]);
 
   // Restore the session on page load
   useEffect(() => {
@@ -25,9 +34,9 @@ export function AuthProvider({ children }) {
 
   // API interceptor fires this when the token expires
   useEffect(() => {
-    window.addEventListener('kc:unauthorized', logout);
-    return () => window.removeEventListener('kc:unauthorized', logout);
-  }, [logout]);
+    window.addEventListener('kc:unauthorized', clearSession);
+    return () => window.removeEventListener('kc:unauthorized', clearSession);
+  }, [clearSession]);
 
   const login = useCallback(async (email, password) => {
     const res = await authApi.login(email, password);

@@ -1,4 +1,5 @@
 import { LogoMark } from '../ui/Logo.jsx';
+import { usePrint } from '../../context/PrintContext.jsx';
 
 // Paper-form building blocks that mirror the clinic's Word templates.
 export const Box = ({ checked }) => <span className="mr-1 inline-block w-[1.1em]">{checked ? '☒' : '☐'}</span>;
@@ -54,5 +55,18 @@ export function Row({ label, children }) {
 }
 
 export const SheetFooter = () => (
-  <footer className="mt-6 text-center text-[10pt] italic">Kildare GP Walk-In CLINIC</footer>
+  // plain upright text on purpose: italic / skewed text came out garbled in PDFs saved from Firefox
+  <footer className="mt-6 text-center text-[10pt]">Kildare GP Walk-In CLINIC</footer>
 );
+
+// The clinic stamp, printed next to the doctor's signature. Shows only when "Add stamp" was ticked in the
+// print dialog (the PNG has a transparent background, so it prints like a real ink stamp).
+export function Stamp({ className = 'mt-3' }) {
+  const { job } = usePrint();
+  if (!job?.stamp) return null;
+  return (
+    <div className={`${className} break-inside-avoid`}>
+      <img src={job.stamp} alt="Clinic stamp" className="h-[24mm] w-auto object-contain" />
+    </div>
+  );
+}

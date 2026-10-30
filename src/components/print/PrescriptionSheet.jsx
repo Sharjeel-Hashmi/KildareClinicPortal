@@ -1,4 +1,4 @@
-import { SheetHeader, Section, Row, SheetFooter } from './parts.jsx';
+import { SheetHeader, Section, Row, SheetFooter, Stamp } from './parts.jsx';
 import { formatDate, fullName } from '../../utils/format.js';
 
 export default function PrescriptionSheet({ prescription: rx }) {
@@ -36,6 +36,7 @@ export default function PrescriptionSheet({ prescription: rx }) {
         )}
         &nbsp;&mdash;&nbsp; {formatDate(rx.date)}
       </p>
+      <Stamp />
 
       <SheetFooter />
     </article>

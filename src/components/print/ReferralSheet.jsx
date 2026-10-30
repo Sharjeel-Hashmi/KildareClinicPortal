@@ -1,4 +1,4 @@
-import { SheetHeader, Section, Row, SheetFooter } from './parts.jsx';
+import { SheetHeader, Section, Row, SheetFooter, Stamp } from './parts.jsx';
 import { formatDate, fullName, REFERRAL_LABEL } from '../../utils/format.js';
 
 export default function ReferralSheet({ referral: rf }) {
@@ -40,6 +40,7 @@ export default function ReferralSheet({ referral: rf }) {
         )}
         &nbsp;&mdash;&nbsp; {formatDate(rf.date)}
       </p>
+      <Stamp />
 
       <SheetFooter />
     </article>

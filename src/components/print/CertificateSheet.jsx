@@ -1,4 +1,4 @@
-import { SheetHeader, Section, Row, Box, SheetFooter } from './parts.jsx';
+import { SheetHeader, Section, Row, Box, SheetFooter, Stamp } from './parts.jsx';
 import { formatDate, fullName } from '../../utils/format.js';
 
 export default function CertificateSheet({ certificate: c }) {
@@ -45,6 +45,7 @@ export default function CertificateSheet({ certificate: c }) {
       <p className="mt-1.5 text-[10.5pt]">
         <strong>Date:</strong> {formatDate(c.dateOfConsultation)}
       </p>
+      <Stamp />
 
       <SheetFooter />
     </article>

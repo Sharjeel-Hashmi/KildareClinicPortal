@@ -1,4 +1,5 @@
 import { LogoMark } from '../ui/Logo.jsx';
+import { Stamp } from './parts.jsx';
 import { formatDate, formatDateTime, fullName } from '../../utils/format.js';
 
 const METHOD_LABEL = { cash: 'Cash', card: 'Card', online: 'Online' };
@@ -133,6 +134,8 @@ export default function InvoiceSheet({ invoice: inv }) {
         <br />
         Refunds (if any) are returned to the same method of payment. Queries: info@kildaredoc.ie
       </p>
+
+      <Stamp className="mb-6 flex justify-end" />
 
       <footer className="rounded-lg bg-gold-500 px-5 py-3 text-[8.5pt] text-ink">
         <p>Medical services supplied by a registered medical practitioner are exempt from VAT (VATCA 2010, Sch. 1).</p>

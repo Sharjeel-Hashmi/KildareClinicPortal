@@ -8,7 +8,7 @@ import { isSuperAdmin } from '../../utils/roles.js';
 import Panel from '../ui/Panel.jsx';
 import Button from '../ui/Button.jsx';
 import ConfirmDialog from '../ui/ConfirmDialog.jsx';
-import { TextField, ChoiceGroup, CheckChoice, PasswordField } from '../ui/Field.jsx';
+import { TextField, TextAreaField, ChoiceGroup, CheckChoice, PasswordField } from '../ui/Field.jsx';
 
 const ROLES = [
   { value: 'doctor', label: 'Doctor' },
@@ -24,6 +24,12 @@ export const emptyDoctor = () => ({
   canManageSettings: false,
   isActive: true,
   password: '',
+  acceptsOnlineBookings: false,
+  slug: '',
+  qualifications: '',
+  specialties: '',
+  bio: '',
+  photoUrl: '',
 });
 
 export default function DoctorForm({ initialValues, editing = false, submitLabel, onSave, onCancel }) {
@@ -53,6 +59,14 @@ export default function DoctorForm({ initialValues, editing = false, submitLabel
       role: superAdmin ? values.role : 'doctor',
       canManageSettings: values.role === 'doctor' ? Boolean(values.canManageSettings) : false,
     };
+    if (values.role === 'doctor') {
+      payload.acceptsOnlineBookings = Boolean(values.acceptsOnlineBookings);
+      payload.slug = values.slug.trim().toLowerCase();
+      payload.qualifications = values.qualifications.trim();
+      payload.specialties = values.specialties;
+      payload.bio = values.bio.trim();
+      payload.photoUrl = values.photoUrl.trim();
+    }
     if (editing) payload.isActive = Boolean(values.isActive);
     if (values.password) payload.password = values.password;
 
@@ -118,6 +132,35 @@ export default function DoctorForm({ initialValues, editing = false, submitLabel
           />
         </div>
       </Panel>
+
+      {values.role === 'doctor' && (
+        <Panel title="Online booking profile">
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <CheckChoice checked={values.acceptsOnlineBookings} onChange={(v) => set('acceptsOnlineBookings', v)}>
+                Show this doctor on the clinic website for online booking
+              </CheckChoice>
+            </div>
+            {values.acceptsOnlineBookings && (
+              <>
+                <TextField
+                  label="Web address name"
+                  hint="Letters, numbers and hyphens. Leave blank to create it from the name."
+                  placeholder="dr-jane-murphy"
+                  {...bind('slug')}
+                />
+                <TextField label="Qualifications" placeholder="MB BCh BAO, MICGP" {...bind('qualifications')} />
+                <TextField label="Specialties" hint="Separate with commas" placeholder="Family medicine, Women's health" {...bind('specialties')} />
+                <TextField label="Photo web link (optional)" type="url" placeholder="https://…" {...bind('photoUrl')} />
+                <div className="sm:col-span-2">
+                  <TextAreaField label="Short bio" rows={3} maxLength={2000} {...bind('bio')} />
+                </div>
+              </>
+            )}
+          </div>
+          <p className="mt-3 text-sm text-muted">Set this doctor's hours under Appointments → Availability, and choose the services they offer in Settings.</p>
+        </Panel>
+      )}
 
       <div className="sticky bottom-0 z-20 -mx-4 flex items-center justify-end gap-2 border-t border-line bg-white/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
         <Button variant="secondary" onClick={() => setConfirmCancel(true)} disabled={saving}>

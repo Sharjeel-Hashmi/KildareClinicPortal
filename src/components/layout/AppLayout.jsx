@@ -1,4 +1,3 @@
-
 import {
   PiSquaresFour,
   PiUsersThree,
@@ -10,6 +9,8 @@ import {
   PiIdentificationCard,
   PiGearSix,
   PiReceipt,
+  PiCalendarCheck,
+  PiShieldCheck,
 } from 'react-icons/pi';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -17,17 +18,21 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import { LogoMark, Wordmark } from '../ui/Logo.jsx';
 import Button from '../ui/Button.jsx';
 import ConfirmDialog from '../ui/ConfirmDialog.jsx';
-import { isAdminLike } from '../../utils/roles.js';
+import { isAdminLike, isSuperAdmin } from '../../utils/roles.js';
+import NotificationBell from '../notifications/NotificationBell.jsx';
+import IdleLogout from './IdleLogout.jsx';
 
 const NAV = [
   { to: '/dashboard', label: 'Dashboard', icon: PiSquaresFour },
   { to: '/patients', label: 'Patients', icon: PiUsersThree },
+  { to: '/appointments', label: 'Appointments', icon: PiCalendarCheck },
   { to: '/consultations', label: 'Consultations', icon: PiStethoscope },
   { to: '/invoices', label: 'Invoices', icon: PiReceipt },
 ];
 
 const ADMIN_NAV = [{ to: '/doctors', label: 'Doctors', icon: PiIdentificationCard }];
 const SETTINGS_NAV = [{ to: '/settings', label: 'Settings', icon: PiGearSix }];
+const SUPER_NAV = [{ to: '/audit', label: 'Audit log', icon: PiShieldCheck }];
 
 function SidebarContent({ onNavigate }) {
   const { user, logout } = useAuth();
@@ -40,6 +45,7 @@ function SidebarContent({ onNavigate }) {
           <Wordmark className="h-4 w-auto max-w-full text-white" />
           <p className="mt-1.5 text-[13px] text-[#a9a79d]">Doctor portal</p>
         </div>
+        <NotificationBell className="ml-auto hidden lg:block" align="left" />
       </div>
 
       <div className="px-4 pb-4">
@@ -53,6 +59,7 @@ function SidebarContent({ onNavigate }) {
           ...NAV,
           ...(isAdminLike(user) ? ADMIN_NAV : []),
           ...(isAdminLike(user) || user?.canManageSettings ? SETTINGS_NAV : []),
+          ...(isSuperAdmin(user) ? SUPER_NAV : []),
         ].map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}
@@ -131,6 +138,8 @@ export default function AppLayout() {
           <LogoMark className="h-8 w-auto" />
           <Wordmark className="h-6 w-auto text-white" />
         </div>
+        <div className="flex items-center gap-1">
+        <NotificationBell align="right" />
         <button
           type="button"
           onClick={() => setOpen(true)}
@@ -139,6 +148,7 @@ export default function AppLayout() {
         >
           <PiList size={24} />
         </button>
+        </div>
       </header>
 
       {/* Mobile drawer */}
@@ -169,6 +179,8 @@ export default function AppLayout() {
           <Outlet />
         </div>
       </main>
+
+      <IdleLogout />
     </div>
   );
 }

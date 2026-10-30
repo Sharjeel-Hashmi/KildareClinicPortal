@@ -38,6 +38,12 @@ export default function DoctorFormPage() {
         canManageSettings: Boolean(existing.canManageSettings),
         isActive: existing.isActive !== false,
         password: '',
+        acceptsOnlineBookings: Boolean(existing.acceptsOnlineBookings),
+        slug: existing.slug || '',
+        qualifications: existing.qualifications || '',
+        specialties: (existing.specialties || []).join(', '),
+        bio: existing.bio || '',
+        photoUrl: existing.photoUrl || '',
       }
     : emptyDoctor();
 

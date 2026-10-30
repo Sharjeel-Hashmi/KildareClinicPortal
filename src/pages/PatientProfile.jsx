@@ -17,6 +17,7 @@ import {
   PiFileText,
   PiFlask,
   PiDownloadSimple,
+  PiEye,
   PiReceipt,
   PiArrowBendUpRight,
 } from 'react-icons/pi';
@@ -37,6 +38,7 @@ import {
 import PageHeader from '../components/ui/PageHeader.jsx';
 import Button from '../components/ui/Button.jsx';
 import Panel from '../components/ui/Panel.jsx';
+import ReportViewer, { downloadHref } from '../components/reports/ReportViewer.jsx';
 import Avatar from '../components/ui/Avatar.jsx';
 import Badge from '../components/ui/Badge.jsx';
 import ConfirmDialog from '../components/ui/ConfirmDialog.jsx';
@@ -55,6 +57,7 @@ export default function PatientProfile() {
   const [deleting, setDeleting] = useState(false);
   const [confirmDeleteReport, setConfirmDeleteReport] = useState(null);
   const [deletingReport, setDeletingReport] = useState(false);
+  const [viewReport, setViewReport] = useState(null);
 
   const patientQ = useFetch(() => patientsApi.get(id), [id]);
   const visitsQ = useFetch(() => patientsApi.consultations(id), [id]);
@@ -391,15 +394,27 @@ export default function PatientProfile() {
                     <span className="w-[4.5rem] shrink-0 text-sm font-semibold text-ink">
                       {formatDate(r.date)}
                     </span>
-                    <span className="min-w-0 flex-1 truncate text-sm text-muted">
+                    <button
+                      type="button"
+                      onClick={() => setViewReport(r)}
+                      className="min-w-0 flex-1 truncate text-left text-sm text-muted hover:text-ink"
+                    >
                       {r.labName}
                       {r.notes && <span className="text-muted/70"> · {r.notes}</span>}
-                    </span>
-                    <a
-                      href={r.fileUrl}
-                      target="_blank"
-                      rel="noreferrer"
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setViewReport(r)}
                       aria-label={`View report from ${r.labName}`}
+                      title="View"
+                      className="grid size-8 shrink-0 place-items-center rounded-lg text-muted hover:bg-gold-50 hover:text-ink"
+                    >
+                      <PiEye size={18} aria-hidden="true" />
+                    </button>
+                    <a
+                      href={downloadHref(r.fileUrl)}
+                      aria-label={`Download report from ${r.labName}`}
+                      title="Download"
                       className="grid size-8 shrink-0 place-items-center rounded-lg text-muted hover:bg-gold-50 hover:text-ink"
                     >
                       <PiDownloadSimple size={18} aria-hidden="true" />
@@ -505,6 +520,8 @@ export default function PatientProfile() {
           </Panel>
         </div>
       </div>
+
+      <ReportViewer report={viewReport} onClose={() => setViewReport(null)} />
 
       <ConfirmDialog
         open={confirmDelete}

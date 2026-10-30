@@ -6,6 +6,7 @@ export const authApi = {
   login: (email, password) => api.post('/auth/login', { email, password }).then(data),
   me: () => api.get('/auth/me').then(data),
   updateMe: (body) => api.put('/auth/me', body).then(data),
+  logout: (reason) => api.post('/auth/logout', reason ? { reason } : {}).then(data),
 };
 
 export const patientsApi = {
@@ -98,4 +99,41 @@ export const usersApi = {
 
 export const statsApi = {
   get: (params) => api.get('/stats', { params }).then(data),
+};
+
+// Active doctors (any signed-in user can read this: the booking form needs it)
+export const doctorsApi = {
+  list: () => api.get('/doctors').then(data),
+};
+
+export const appointmentsApi = {
+  list: (params) => api.get('/appointments', { params }).then(data),
+  get: (id) => api.get(`/appointments/${id}`).then(data),
+  create: (body) => api.post('/appointments', body).then(data),
+  setStatus: (id, status, reason) => api.patch(`/appointments/${id}/status`, { status, reason }).then(data),
+  linkPatient: (id, patientId) => api.patch(`/appointments/${id}/patient`, { patientId }).then(data),
+};
+
+// doctorId is a doctor's id, or 'me'
+export const availabilityApi = {
+  get: (doctorId) => api.get(`/availability/${doctorId}`).then(data),
+  save: (doctorId, body) => api.put(`/availability/${doctorId}`, body).then(data),
+  slots: (doctorId, params) => api.get(`/availability/${doctorId}/slots`, { params }).then(data),
+  dates: (doctorId, params) => api.get(`/availability/${doctorId}/dates`, { params }).then(data),
+};
+
+export const notificationsApi = {
+  list: (params) => api.get('/notifications', { params }).then(data),
+  markRead: (body) => api.post('/notifications/read', body).then(data),
+};
+
+export const auditApi = {
+  list: (params) => api.get('/audit', { params }).then(data),
+  print: (body) => api.post('/audit/print', body).then(data),
+};
+
+// Clinic-wide settings (the print stamp). Everyone reads; only a Super Admin saves.
+export const clinicSettingsApi = {
+  get: () => api.get('/clinic-settings').then(data),
+  update: (body) => api.put('/clinic-settings', body).then(data),
 };
