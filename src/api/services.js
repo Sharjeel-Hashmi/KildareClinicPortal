@@ -137,3 +137,22 @@ export const clinicSettingsApi = {
   get: () => api.get('/clinic-settings').then(data),
   update: (body) => api.put('/clinic-settings', body).then(data),
 };
+
+// Super Admin only: clinic expenses, their categories, and the income / profit summary
+export const expensesApi = {
+  list: (params) => api.get('/expenses', { params }).then(data),
+  create: (body) => api.post('/expenses', body).then(data),
+  update: (id, body) => api.put(`/expenses/${id}`, body).then(data),
+  remove: (id) => api.delete(`/expenses/${id}`).then(data),
+};
+
+export const expenseCategoriesApi = {
+  list: () => api.get('/expenses/categories').then(data),
+  create: (body) => api.post('/expenses/categories', body).then(data),
+  update: (id, body) => api.put(`/expenses/categories/${id}`, body).then(data),
+  remove: (id) => api.delete(`/expenses/categories/${id}`).then(data),
+};
+
+export const financeApi = {
+  summary: (params) => api.get('/finance/summary', { params }).then(data),
+};

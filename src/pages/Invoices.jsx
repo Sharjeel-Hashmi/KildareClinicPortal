@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { PiMagnifyingGlass, PiReceipt, PiX, PiCaretRight } from 'react-icons/pi';
-import { invoicesApi } from '../api/services.js';
+import { doctorsApi, invoicesApi } from '../api/services.js';
+import { useAuth } from '../context/AuthContext.jsx';
+import { isAdminLike, isSuperAdmin } from '../utils/roles.js';
+import { eur } from '../utils/money.js';
+import { SelectField } from '../components/ui/Field.jsx';
+import ExpensesTab from '../components/invoices/ExpensesTab.jsx';
+import ReportsTab from '../components/invoices/ReportsTab.jsx';
 import useFetch from '../hooks/useFetch.js';
 import useDebounce from '../hooks/useDebounce.js';
 import { formatDate, fullName } from '../utils/format.js';
@@ -14,31 +20,61 @@ import { SkeletonRows, EmptyState, ErrorState } from '../components/ui/States.js
 const METHOD_LABEL = { cash: 'Cash', card: 'Card', online: 'Online' };
 const METHOD_TONE = { cash: 'gold', card: 'info', online: 'neutral' };
 
-export default function Invoices() {
+function InvoiceList() {
+  const { user } = useAuth();
+  const admin = isAdminLike(user);
   const navigate = useNavigate();
+  const [params, setParams] = useSearchParams();
+  // filters that can arrive from the Reports tab (a doctor's invoices for a month / year)
+  const from = params.get('from') || '';
+  const to = params.get('to') || '';
+  const doctorName = params.get('doctorName') || '';
+  const [doctorId, setDoctorId] = useState(params.get('doctorId') || '');
+  const doctors = useFetch(() => (admin ? doctorsApi.list() : Promise.resolve(null)), [admin]);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const term = useDebounce(search.trim(), 300);
 
-  useEffect(() => setPage(1), [term]);
+  useEffect(() => setPage(1), [term, doctorId, from, to]);
+
+  const clearRange = () => {
+    setDoctorId('');
+    setParams({});
+  };
 
   const { data, loading, error, reload } = useFetch(
-    () => invoicesApi.list({ search: term || undefined, page, limit: 10 }),
-    [term, page],
+    () =>
+      invoicesApi.list({
+        search: term || undefined,
+        page,
+        limit: 10,
+        doctorId: admin && doctorId ? doctorId : undefined,
+        from: from || undefined,
+        to: to || undefined,
+      }),
+    [term, page, doctorId, from, to, admin],
     { keepPrevious: true }
   );
   const rows = data?.invoices || [];
 
   return (
     <>
-      <PageHeader title="Invoices" subtitle={data ? `${data.total} recorded` : 'Every paid invoice'} />
-
       <div className="overflow-hidden rounded-xl border border-line bg-white">
-        <div className="border-b border-line p-4">
+        {(from || to) && (
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line bg-gold-50 px-4 py-2.5 text-sm">
+            <span className="font-medium">
+              Showing {doctorName ? `${doctorName}’s invoices` : 'invoices'} · {formatDate(from)} – {formatDate(to)}
+            </span>
+            <button type="button" onClick={clearRange} className="font-semibold text-gold-700 hover:underline">
+              Show all invoices
+            </button>
+          </div>
+        )}
+        <div className="flex flex-wrap items-end gap-3 border-b border-line p-4">
           <label htmlFor="invoice-search" className="sr-only">
             Search invoices
           </label>
-          <div className="relative max-w-md">
+          <div className="relative min-w-60 max-w-md flex-1">
             <PiMagnifyingGlass
               size={20}
               aria-hidden="true"
@@ -63,6 +99,21 @@ export default function Invoices() {
               </button>
             )}
           </div>
+          {admin && (doctors.data?.doctors || []).length > 0 && (
+            <SelectField id="invoice-doctor" label="Doctor" className="w-52" value={doctorId} onChange={(e) => setDoctorId(e.target.value)}>
+              <option value="">All doctors</option>
+              {doctors.data.doctors.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name}
+                </option>
+              ))}
+            </SelectField>
+          )}
+          {data && (
+            <p className="ml-auto text-sm text-muted">
+              {data.total} {data.total === 1 ? 'invoice' : 'invoices'} · <span className="font-bold text-ink tabular-nums">{eur(data.totalAmount ?? 0)}</span>
+            </p>
+          )}
         </div>
 
         {error && !data ? (
@@ -94,6 +145,7 @@ export default function Invoices() {
                   <th scope="col" className="px-5 py-3 font-semibold">Date</th>
                   <th scope="col" className="px-3 py-3 font-semibold">Receipt no.</th>
                   <th scope="col" className="px-3 py-3 font-semibold">Patient</th>
+                  {admin && <th scope="col" className="px-3 py-3 font-semibold">Doctor</th>}
                   <th scope="col" className="px-3 py-3 font-semibold">Method</th>
                   <th scope="col" className="px-3 py-3 text-right font-semibold">Amount €</th>
                   <th scope="col" className="w-10 px-3 py-3"><span className="sr-only">Open</span></th>
@@ -120,6 +172,7 @@ export default function Invoices() {
                       <span className="block font-medium">{fullName(inv.patient)}</span>
                       <span className="block text-sm text-muted">{inv.patient?.patientNo}</span>
                     </td>
+                    {admin && <td className="px-3 py-3 text-[15px] text-muted">{inv.createdBy?.name || inv.takenBy || '—'}</td>}
                     <td className="px-3 py-3">
                       <Badge tone={METHOD_TONE[inv.paymentMethod]}>{METHOD_LABEL[inv.paymentMethod]}</Badge>
                     </td>
@@ -144,6 +197,7 @@ export default function Invoices() {
                     </span>
                     <span className="mt-0.5 block text-sm text-muted">
                       {inv.receiptNumber} · {formatDate(inv.date)}
+                      {admin && (inv.createdBy?.name || inv.takenBy) ? ` · ${inv.createdBy?.name || inv.takenBy}` : ''}
                     </span>
                     <span className="mt-0.5 block text-sm font-semibold">€{inv.subtotal.toFixed(2)}</span>
                   </Link>
@@ -155,6 +209,54 @@ export default function Invoices() {
           </div>
         )}
       </div>
+    </>
+  );
+}
+
+const TABS = [
+  { id: 'invoices', label: 'Invoices' },
+  { id: 'expenses', label: 'Expenses' },
+  { id: 'reports', label: 'Reports' },
+];
+
+// Everyone sees the invoice list. The Super Admin also gets Expenses and Reports (income, expenses, profit).
+export default function Invoices() {
+  const { user } = useAuth();
+  const superAdmin = isSuperAdmin(user);
+  const [params, setParams] = useSearchParams();
+  const requested = params.get('tab');
+  const tab = superAdmin && (requested === 'expenses' || requested === 'reports') ? requested : 'invoices';
+
+  const subtitle = {
+    invoices: 'Every paid invoice',
+    expenses: 'Clinic expenses and receipts',
+    reports: 'Income, expenses and profit',
+  }[tab];
+
+  return (
+    <>
+      <PageHeader title="Invoices" subtitle={subtitle} />
+
+      {superAdmin && (
+        <div role="tablist" aria-label="Invoices sections" className="mb-5 flex gap-1 border-b border-line">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              role="tab"
+              aria-selected={tab === t.id}
+              onClick={() => setParams(t.id === 'invoices' ? {} : { tab: t.id })}
+              className={`-mb-px border-b-2 px-4 py-2.5 text-[15px] font-semibold transition-colors ${
+                tab === t.id ? 'border-gold-600 text-ink' : 'border-transparent text-muted hover:text-ink'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {tab === 'invoices' ? <InvoiceList /> : tab === 'expenses' ? <ExpensesTab /> : <ReportsTab />}
     </>
   );
 }
