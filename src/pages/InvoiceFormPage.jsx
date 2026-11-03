@@ -31,6 +31,8 @@ export default function InvoiceFormPage() {
   const initial = invoice
     ? {
         date: toDateInput(invoice.date),
+        // older invoices have no doctor: fall back to their creator when that was a doctor
+        doctor: invoice.doctor?._id || (invoice.createdBy?.role === 'doctor' ? invoice.createdBy._id : ''),
         lineItems: invoice.lineItems.map((it) => ({ description: it.description, amount: String(it.amount) })),
         paymentMethod: invoice.paymentMethod,
         cardLast4: invoice.cardLast4 || '',

@@ -5,6 +5,7 @@ import { financeApi } from '../../api/services.js';
 import useFetch from '../../hooks/useFetch.js';
 import { eur } from '../../utils/money.js';
 import Panel from '../ui/Panel.jsx';
+import Badge from '../ui/Badge.jsx';
 import { Spinner, ErrorState, EmptyState } from '../ui/States.jsx';
 import PeriodPicker, { initialPeriod, periodLabel, periodRange, MONTHS } from './PeriodPicker.jsx';
 import ProfitChart from './ProfitChart.jsx';
@@ -85,7 +86,14 @@ export default function ReportsTab() {
                       >
                         <span className="flex items-center gap-3">
                           <span className="min-w-0 flex-1">
-                            <span className="block truncate font-semibold">{d.name}</span>
+                            <span className="flex items-center gap-2">
+                              <span className="truncate font-semibold">{d.name}</span>
+                              {!d.assigned && (
+                                <span title="These invoices were entered by an admin without choosing a doctor. Edit each invoice to assign a doctor.">
+                                  <Badge tone="danger">No doctor chosen</Badge>
+                                </span>
+                              )}
+                            </span>
                             <span className="block text-sm text-muted">
                               {d.invoices} {d.invoices === 1 ? 'invoice' : 'invoices'} · {d.share}% of income
                             </span>

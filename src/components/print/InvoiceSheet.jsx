@@ -6,7 +6,7 @@ const METHOD_LABEL = { cash: 'Cash', card: 'Card', online: 'Online' };
 
 export default function InvoiceSheet({ invoice: inv }) {
   const p = inv.patient || {};
-  const clinician = inv.createdBy?.name || inv.takenBy;
+  const clinician = inv.doctor?.name || inv.createdBy?.name || inv.takenBy;
 
   return (
     <article className="font-sans text-[11pt] text-ink">

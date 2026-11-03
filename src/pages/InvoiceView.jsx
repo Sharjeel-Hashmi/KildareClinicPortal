@@ -115,7 +115,10 @@ export default function InvoiceView() {
             {inv.cardAuthCode && <p>Auth code: {inv.cardAuthCode}</p>}
           </div>
         )}
-        <p className="mt-2 text-sm text-muted">Taken by {inv.takenBy}</p>
+        <p className="mt-2 text-sm text-muted">
+          Doctor: {inv.doctor?.name || inv.takenBy}
+          {inv.createdBy?.name && inv.createdBy.name !== (inv.doctor?.name || inv.takenBy) ? ` · entered by ${inv.createdBy.name}` : ''}
+        </p>
       </Panel>
 
       <ConfirmDialog

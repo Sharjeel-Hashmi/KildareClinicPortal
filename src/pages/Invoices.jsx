@@ -172,7 +172,7 @@ function InvoiceList() {
                       <span className="block font-medium">{fullName(inv.patient)}</span>
                       <span className="block text-sm text-muted">{inv.patient?.patientNo}</span>
                     </td>
-                    {admin && <td className="px-3 py-3 text-[15px] text-muted">{inv.createdBy?.name || inv.takenBy || '—'}</td>}
+                    {admin && <td className="px-3 py-3 text-[15px] text-muted">{inv.doctor?.name || inv.createdBy?.name || inv.takenBy || '—'}</td>}
                     <td className="px-3 py-3">
                       <Badge tone={METHOD_TONE[inv.paymentMethod]}>{METHOD_LABEL[inv.paymentMethod]}</Badge>
                     </td>
@@ -197,7 +197,7 @@ function InvoiceList() {
                     </span>
                     <span className="mt-0.5 block text-sm text-muted">
                       {inv.receiptNumber} · {formatDate(inv.date)}
-                      {admin && (inv.createdBy?.name || inv.takenBy) ? ` · ${inv.createdBy?.name || inv.takenBy}` : ''}
+                      {admin && (inv.doctor?.name || inv.createdBy?.name || inv.takenBy) ? ` · ${inv.doctor?.name || inv.createdBy?.name || inv.takenBy}` : ''}
                     </span>
                     <span className="mt-0.5 block text-sm font-semibold">€{inv.subtotal.toFixed(2)}</span>
                   </Link>

@@ -3,7 +3,9 @@ import toast from 'react-hot-toast';
 import { PiPlus, PiTrash } from 'react-icons/pi';
 import useForm from '../../hooks/useForm.js';
 import useFetch from '../../hooks/useFetch.js';
-import { servicesApi } from '../../api/services.js';
+import { doctorsApi, servicesApi } from '../../api/services.js';
+import { useAuth } from '../../context/AuthContext.jsx';
+import { isAdminLike } from '../../utils/roles.js';
 import { getErrorMessage, getFieldErrors } from '../../api/client.js';
 import { validateInvoice } from '../../utils/validators.js';
 import { todayInput } from '../../utils/format.js';
@@ -17,6 +19,7 @@ const newLine = () => ({ description: '', amount: '' });
 
 export const newInvoice = () => ({
   date: todayInput(),
+  doctor: '', // chosen by Admin / Super Admin; a doctor's own invoices are always in their name
   lineItems: [newLine()],
   paymentMethod: '',
   cardLast4: '',
@@ -30,6 +33,8 @@ const PAYMENT_OPTIONS = [
 ];
 
 export default function InvoiceForm({ initial, submitLabel = 'Save invoice', onSave, onCancel }) {
+  const { user } = useAuth();
+  const admin = isAdminLike(user);
   const form = useForm(initial || newInvoice());
   const { values, set, bind, setValues } = form;
   const [saving, setSaving] = useState(false);
@@ -37,6 +42,8 @@ export default function InvoiceForm({ initial, submitLabel = 'Save invoice', onS
 
   const servicesQ = useFetch(() => servicesApi.list(), []);
   const services = servicesQ.data?.services || [];
+  const doctorsQ = useFetch(() => (admin ? doctorsApi.list() : Promise.resolve(null)), [admin]);
+  const doctors = doctorsQ.data?.doctors || [];
 
   const setLine = (i, patch) =>
     setValues((v) => ({ ...v, lineItems: v.lineItems.map((it, idx) => (idx === i ? { ...it, ...patch } : it)) }));
@@ -53,6 +60,7 @@ export default function InvoiceForm({ initial, submitLabel = 'Save invoice', onS
   const submit = async (e) => {
     e.preventDefault();
     const errs = validateInvoice(values);
+    if (admin && !values.doctor) errs.doctor = 'Choose the doctor this invoice is for';
     if (Object.keys(errs).length) {
       form.setErrors(errs);
       toast.error('Please check the highlighted fields', { id: 'form-invalid' });
@@ -63,6 +71,7 @@ export default function InvoiceForm({ initial, submitLabel = 'Save invoice', onS
     try {
       await onSave({
         date: new Date(values.date).toISOString(),
+        doctor: admin ? values.doctor : undefined,
         lineItems: values.lineItems
           .filter((it) => it.description.trim() && Number(it.amount) > 0)
           .map((it) => ({ description: it.description.trim(), amount: Number(it.amount) })),
@@ -83,6 +92,28 @@ export default function InvoiceForm({ initial, submitLabel = 'Save invoice', onS
       <Panel title="Invoice details">
         <div className="grid gap-5 sm:grid-cols-2">
           <TextField label="Date" type="date" required {...bind('date')} />
+          {admin ? (
+            <SelectField
+              label="Doctor"
+              required
+              value={values.doctor}
+              error={form.errors.doctor}
+              onChange={(e) => set('doctor', e.target.value)}
+              hint="The income from this invoice is counted for this doctor"
+            >
+              <option value="">Select doctor…</option>
+              {doctors.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name}
+                </option>
+              ))}
+            </SelectField>
+          ) : (
+            <div>
+              <p className="mb-1.5 text-sm font-medium text-ink">Doctor</p>
+              <p className="flex h-11 items-center text-[15px] font-medium">{user.name}</p>
+            </div>
+          )}
         </div>
       </Panel>
 
